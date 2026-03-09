@@ -1,0 +1,274 @@
+.page{
+  padding: 18px;
+  background: var(--bg-main);
+}
+
+.header{
+  margin-bottom: 14px;
+}
+
+.filters{
+  display:flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items:center;
+}
+
+.chip{
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--primary-border);
+  background: var(--primary-soft);
+  cursor: pointer;
+  font-weight: 900;
+  color: var(--text-main);
+}
+
+.chip.active{
+  background: var(--primary-soft-2);
+}
+
+.search{
+  margin: 12px 0 18px;
+}
+
+.search-bar{
+  display:flex;
+  gap: 12px;
+  align-items:center;
+  flex-wrap: wrap;
+}
+
+.search-input{
+  flex: 1;
+  min-width: 240px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-soft);
+  outline: none;
+  color: var(--text-main);
+}
+
+.search-input:focus{
+  border-color: var(--primary-border);
+  box-shadow: 0 0 0 4px rgba(61,138,255,.12);
+}
+
+.search-btn{
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border-light);
+  background: var(--primary-soft);
+  cursor: pointer;
+  font-weight: 900;
+  color: var(--text-main);
+}
+
+.search-btn:disabled{
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.search-meta{
+  margin-top: 10px;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.error{
+  color: var(--danger);
+  font-weight: 800;
+  margin-top: 10px;
+}
+
+.loading{
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.grid{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.card{
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid var(--border-soft);
+  background: var(--bg-surface);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+}
+
+.cover{
+  width: 110px;
+  height: 140px;
+  flex: 0 0 110px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--primary-soft);
+  border: 1px solid var(--primary-border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.cover-img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display:block;
+}
+
+.meta{
+  flex: 1;
+  min-width: 0;
+}
+
+.top{
+  display:flex;
+  gap: 10px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.title{
+  margin: 0;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1.2;
+  color: var(--text-main);
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.author{
+  margin: 10px 0 0;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.badge{
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-soft);
+  font-weight: 900;
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--text-main);
+}
+
+.actions{
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+  align-items:center;
+}
+
+.actions-row{
+  display: flex;
+  align-items: center;        /* أهم سطر للمحاذاة */
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-right: 30px;
+}
+
+.btn{
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  border: 1px solid var(--border-light);
+  background: var(--bg-soft);
+  color: var(--text-main);
+}
+
+.btn.primary{
+  background: var(--primary-soft);
+  border-color: var(--primary-border);
+}
+
+.btn.ghost{
+  text-decoration: underline;
+  background: transparent;
+  border-color: transparent;
+  padding-left: 0;
+  color: var(--text-muted);
+}
+
+/* لو احتجتي btn.danger لشي ثاني خليه، بس الحذف صار icon-btn */
+.btn.danger{
+  color: var(--danger);
+}
+
+.empty{
+  margin: 16px 0;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px dashed var(--border-light);
+  background: var(--bg-soft);
+  color: var(--text-muted);
+}
+
+.library{
+  margin-top: 24px;
+}
+
+/* ✅ زر أيقونة بدون خلفية */
+.icon-btn{
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 100%;               
+  line-height: 1;
+}
+
+.icon-btn svg{
+  display: block;
+  vertical-align: middle;
+}
+
+.icon-btn.danger{
+  color: #e53935;
+}
+
+
+.icon-btn.danger:hover{
+  color: #b71c1c;
+  transform: scale(1.1);
+  transition: 0.2s ease;
+}
+
+.icon-btn:focus{
+  outline: none;
+}
+
+.icon-btn{
+  transform: translateY(-1px);
+}
+
+@media (max-width: 520px){
+  .grid{ grid-template-columns: 1fr; }
+
+  .cover{
+    width: 96px;
+    height: 126px;
+    flex-basis: 96px;
+  }
+}

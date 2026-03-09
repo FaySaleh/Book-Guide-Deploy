@@ -1,0 +1,82 @@
+{
+  "APP": { "TITLE": "Book Guide" },
+
+  "NAV": {
+    "DASHBOARD": "لوحة التحكم",
+    "LIBRARY": "مكتبتي",
+    "NOTIFICATIONS": "الإشعارات",
+    "LOGOUT": "تسجيل الخروج"
+  },
+
+  "COMMON": {
+    "WELCOME": "أهلاً، {{name}}"
+  },
+
+  "DASH": {
+    "TITLE": "لوحة التحكم",
+    "SUBTITLE": "إحصائيات قراءتك وإنجازاتك",
+    "SHOW_MORE": "عرض المزيد من الإحصائيات",
+    "SHOW_LESS": "إخفاء التفاصيل",
+    "LOADING": "جاري تحميل لوحة التحكم...",
+    "ERROR_TITLE": "حدث خطأ",
+    "ACHIEVEMENTS": { "TITLE": "الإنجازات" },
+    "STATS": {
+      "TOTAL_BOOKS": "إجمالي الكتب",
+      "FINISHED": "المكتملة",
+      "PAGES_READ": "الصفحات المقروءة",
+      "READING_DAYS": "أيام القراءة",
+      "TO_READ": "قيد الانتظار",
+      "READING_NOW": "قيد القراءة",
+      "STREAK": "سلسلة القراءة",
+      "DAYS": "يوم"
+    }
+  },
+
+"ACH": {
+  "FIRST_BOOK": { "TITLE": "أول كتاب", "DESC": "أنهِي أول كتاب لك" },
+  "PAGES_1000": { "TITLE": "1000 صفحة", "DESC": "اقرأ 1000 صفحة" },
+  "FIVE_BOOKS": { "TITLE": "5 كتب", "DESC": "أنهِي 5 كتب" },
+  "TEN_BOOKS": { "TITLE": "10 كتب", "DESC": "أنهِي 10 كتب" },
+  "STREAK_7": { "TITLE": "سلسلة 7 أيام", "DESC": "اقرأ 7 أيام متتالية" }
+},
+
+"LIB": {
+  "FILTERS": {
+    "ALL": "الكل",
+    "TO_READ": "للقراءة",
+    "READING": "قيد القراءة",
+    "FINISHED": "مكتملة"
+  },
+  "SEARCH_PLACEHOLDER": "ابحث عن كتب (خارجي)...",
+  "SEARCH": "بحث",
+  "SEARCHING": "جاري البحث...",
+  "CLEAR": "مسح",
+  "SHOWING_RESULTS_FOR": "عرض النتائج لـ",
+  "EXTERNAL": "خارجي",
+  "ADD_TO_LIBRARY": "إضافة إلى مكتبتي",
+  "NO_EXTERNAL_RESULTS_TITLE": "لا توجد نتائج خارجية",
+  "NO_EXTERNAL_RESULTS_DESC": "جرّب كلمة مختلفة.",
+  "LOADING_LIBRARY": "جاري تحميل مكتبتي...",
+  "DETAILS": "التفاصيل",
+  "DELETE": "حذف",
+  "NO_MATCHING_TITLE": "لا توجد كتب مطابقة",
+  "NO_MATCHING_DESC": "جرّب فلتر مختلف.",
+  "RESET_FILTER": "إعادة تعيين الفلتر"
+},
+
+"BOOK": {
+  "CURRENT_PAGE": "الصفحة الحالية",
+  "TOTAL_PAGES": "إجمالي الصفحات",
+  "UPDATE_PROGRESS": "تحديث التقدم",
+  "LOADING_PROGRESS": "جاري تحميل التقدم...",
+  "SAVING": "جاري الحفظ...",
+  "NO_PROGRESS_YET": "لا يوجد تقدم بعد.",
+  "CLEAR": "مسح",
+  "INFO": {
+    "STATUS": "الحالة",
+    "RATING": "التقييم",
+    "STARTED": "بدأ",
+    "FINISHED": "انتهى"
+  }
+}
+}

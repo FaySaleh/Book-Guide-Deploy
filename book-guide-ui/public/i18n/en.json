@@ -1,0 +1,85 @@
+{
+  "APP": { 
+    "TITLE": "Book Guide" 
+  },
+
+  "NAV": {
+    "DASHBOARD": "Dashboard",
+    "LIBRARY": "My Library",
+    "NOTIFICATIONS": "Notifications",
+    "LOGOUT": "Logout"
+  },
+
+  "COMMON": { 
+    "WELCOME": "Welcome, {{name}}" 
+  },
+
+  "DASH": {
+    "TITLE": "Dashboard",
+    "SUBTITLE": "Your reading stats and achievements",
+    "SHOW_MORE": "Show more stats",
+    "SHOW_LESS": "Hide details",
+    "LOADING": "Loading dashboard...",
+    "ERROR_TITLE": "Something went wrong",
+    "ACHIEVEMENTS": { 
+      "TITLE": "Achievements" 
+    },
+    "STATS": {
+      "TOTAL_BOOKS": "Total Books",
+      "FINISHED": "Finished",
+      "PAGES_READ": "Pages Read",
+      "READING_DAYS": "Reading Days",
+      "TO_READ": "To Read",
+      "READING_NOW": "Reading Now",
+      "STREAK": "Streak",
+      "DAYS": "days"
+    }
+  },
+
+"ACH": {
+  "FIRST_BOOK": { "TITLE": "First Book", "DESC": "Finish your first book" },
+  "PAGES_1000": { "TITLE": "1000 Pages", "DESC": "Read 1000 pages" },
+  "FIVE_BOOKS": { "TITLE": "5 Books", "DESC": "Finish 5 books" },
+  "TEN_BOOKS": { "TITLE": "10 Books", "DESC": "Finish 10 books" },
+  "STREAK_7": { "TITLE": "7-day Streak", "DESC": "Read 7 days in a row" }
+},
+"LIB": {
+  "FILTERS": {
+    "ALL": "All",
+    "TO_READ": "To Read",
+    "READING": "Reading",
+    "FINISHED": "Finished"
+  },
+  "SEARCH_PLACEHOLDER": "Search books (external)...",
+  "SEARCH": "Search",
+  "SEARCHING": "Searching...",
+  "CLEAR": "Clear",
+  "SHOWING_RESULTS_FOR": "Showing results for",
+  "EXTERNAL": "External",
+  "ADD_TO_LIBRARY": "Add to My Library",
+  "NO_EXTERNAL_RESULTS_TITLE": "No external results",
+  "NO_EXTERNAL_RESULTS_DESC": "Try a different keyword.",
+  "LOADING_LIBRARY": "Loading my library...",
+  "DETAILS": "Details",
+  "DELETE": "Delete",
+  "NO_MATCHING_TITLE": "No matching books",
+  "NO_MATCHING_DESC": "Try a different filter.",
+  "RESET_FILTER": "Reset Filter"
+},
+
+"BOOK": {
+  "CURRENT_PAGE": "Current Page",
+  "TOTAL_PAGES": "Total Pages",
+  "UPDATE_PROGRESS": "Update Progress",
+  "LOADING_PROGRESS": "Loading progress...",
+  "SAVING": "Saving...",
+  "NO_PROGRESS_YET": "No progress yet.",
+  "CLEAR": "Clear",
+  "INFO": {
+    "STATUS": "Status",
+    "RATING": "Rating",
+    "STARTED": "Started",
+    "FINISHED": "Finished"
+  }
+}
+}

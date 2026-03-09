@@ -1,0 +1,90 @@
+<nav class="nav">
+  <div class="left">
+    <img src="/Logo.png" alt="Book Guide Logo" class="navLogo" />
+
+    <div class="brand-area">
+      <span class="brand">{{ 'APP.TITLE' | translate }}</span>
+
+      <span class="welcome" *ngIf="isLoggedIn && userName">
+        {{ 'COMMON.WELCOME' | translate:{ name: userName } }}
+      </span>
+    </div>
+  </div>
+
+  <div class="right">
+
+    <!-- Language -->
+<button class="icon-btn lang-btn" (click)="toggleLang()" title="Language">
+  {{ lang.current() === 'ar' ? 'EN' : 'AR' }}
+</button>
+
+    <!-- Library -->
+    <a
+      class="text-link"
+      routerLink="/books"
+      routerLinkActive="active"
+      *ngIf="isLoggedIn"
+    >
+      {{ 'NAV.LIBRARY' | translate }}
+    </a>
+
+    <!-- Dashboard (Icon) -->
+    <a
+      class="text-link"
+      routerLink="/dashboard"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      [attr.title]="'NAV.DASHBOARD' | translate"
+      [attr.aria-label]="'NAV.DASHBOARD' | translate"
+    >
+      <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+        <path
+          d="M4 4h16v16H4V4zm2 14h3V10H6v8zm5 0h3V6h-3v12zm5 0h3V13h-3v5z"
+        ></path>
+      </svg>
+    </a>
+
+    <!-- Notifications -->
+    <a
+      class="text-link notif-link"
+      routerLink="/notifications"
+      routerLinkActive="active"
+      *ngIf="isLoggedIn"
+      [attr.aria-label]="'NAV.NOTIFICATIONS' | translate"
+      [attr.title]="'NAV.NOTIFICATIONS' | translate"
+    >
+      <span class="icon-wrap">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M15 17H9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M18 17V11a6 6 0 10-12 0v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M20 17H4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M10 20a2 2 0 004 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+
+        <span class="badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+      </span>
+    </a>
+
+    <!-- Logout -->
+    <a
+      class="text-link"
+      type="button"
+      (click)="logout()"
+      *ngIf="isLoggedIn"
+      [attr.aria-label]="'NAV.LOGOUT' | translate"
+      [attr.title]="'NAV.LOGOUT' | translate"
+    >
+      <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M5 3h10a2 2 0 012 2v14a2 2 0 01-2 2H5"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M13 12h.01"
+              stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <path d="M11 12H3"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M6 9l-3 3 3 3"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+
+  </div>
+</nav>

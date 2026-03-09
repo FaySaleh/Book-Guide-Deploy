@@ -1,0 +1,151 @@
+<div class="page">
+
+  <header class="header">
+    <div class="filters" role="tablist" aria-label="Filter by status">
+      <button class="chip" [class.active]="activeFilter==='all'" (click)="setFilter('all')">
+        {{ 'LIB.FILTERS.ALL' | translate }}
+      </button>
+
+      <button class="chip" [class.active]="activeFilter==='ToRead'" (click)="setFilter('ToRead')">
+        {{ 'LIB.FILTERS.TO_READ' | translate }}
+      </button>
+
+      <button class="chip" [class.active]="activeFilter==='Reading'" (click)="setFilter('Reading')">
+        {{ 'LIB.FILTERS.READING' | translate }}
+      </button>
+
+      <button class="chip" [class.active]="activeFilter==='Finished'" (click)="setFilter('Finished')">
+        {{ 'LIB.FILTERS.FINISHED' | translate }}
+      </button>
+    </div>
+  </header>
+
+  <section class="search">
+    <div class="search-bar">
+      <input
+        class="search-input"
+        type="text"
+        [placeholder]="'LIB.SEARCH_PLACEHOLDER' | translate"
+        [(ngModel)]="searchTerm"
+      />
+
+      <button class="search-btn" type="button"
+        (click)="searchExternal()"
+        [disabled]="!searchTerm.trim() || searching">
+        {{ searching ? ('LIB.SEARCHING' | translate) : ('LIB.SEARCH' | translate) }}
+      </button>
+
+      <button class="search-btn" type="button"
+        (click)="clearSearch()"
+        [disabled]="!searchTerm.trim() && !results.length">
+        {{ 'LIB.CLEAR' | translate }}
+      </button>
+    </div>
+
+    <div class="search-meta" *ngIf="searchTerm.trim().length >= 1">
+      <span>
+        {{ 'LIB.SHOWING_RESULTS_FOR' | translate }} "<b>{{ searchTerm }}</b>"
+      </span>
+    </div>
+
+    <p *ngIf="searchError" class="error">{{ searchError }}</p>
+  </section>
+
+  <section class="grid" *ngIf="results.length">
+    <article class="card" *ngFor="let b of results">
+      <div class="cover">
+        <img
+          class="cover-img"
+          [src]="b.coverUrl ? b.coverUrl : '/placeholder-book.png'"
+          (error)="onCoverError($event)"
+          alt="cover"
+        />
+      </div>
+
+      <div class="meta">
+        <div class="top">
+          <h3 class="title" title="{{b.title}}">{{ b.title }}</h3>
+          <span class="badge" data-status="external">{{ 'LIB.EXTERNAL' | translate }}</span>
+        </div>
+
+        <p class="author" *ngIf="b.author">{{ b.author }}</p>
+
+        <div class="actions">
+          <button class="btn primary" type="button" (click)="addToMyLibrary(b)">
+            {{ 'LIB.ADD_TO_LIBRARY' | translate }}
+          </button>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <div class="empty"
+       *ngIf="!searching && searchTerm.trim() && !results.length && !searchError">
+    <h2>{{ 'LIB.NO_EXTERNAL_RESULTS_TITLE' | translate }}</h2>
+    <p>{{ 'LIB.NO_EXTERNAL_RESULTS_DESC' | translate }}</p>
+  </div>
+
+  <section class="library">
+    <p *ngIf="libraryError" class="error">{{ libraryError }}</p>
+    <p *ngIf="loadingLibrary" class="loading">{{ 'LIB.LOADING_LIBRARY' | translate }}</p>
+
+    <section class="grid"
+      *ngIf="!loadingLibrary && filteredBooks.length; else emptyState">
+      <article class="card" *ngFor="let b of filteredBooks">
+        <div class="cover">
+          <img
+            class="cover-img"
+            [src]="b.coverUrl ? b.coverUrl : '/placeholder-book.png'"
+            (error)="onCoverError($event)"
+            alt="cover"
+          />
+        </div>
+
+        <div class="meta">
+
+          <div class="top">
+            <h3 class="title" title="{{b.title}}">{{ b.title }}</h3>
+
+            <span class="badge" [attr.data-status]="b.status">
+              {{ statusLabel(b.status) }}
+            </span>
+          </div>
+
+          <p class="author" *ngIf="b.author">{{ b.author }}</p>
+
+          <div class="actions-row">
+            <a class="btn ghost" [routerLink]="['/books', b.id]">
+              {{ 'LIB.DETAILS' | translate }}
+            </a>
+
+            <button class="icon-btn danger"
+              type="button"
+              (click)="deleteFromMyLibrary(b)"
+              [title]="'LIB.DELETE' | translate"
+              [attr.aria-label]="'LIB.DELETE' | translate"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                   fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+              </svg>
+            </button>
+          </div>
+
+        </div>
+      </article>
+    </section>
+
+    <ng-template #emptyState>
+      <div class="empty" *ngIf="!searchTerm.trim()">
+        <h2>{{ 'LIB.NO_MATCHING_TITLE' | translate }}</h2>
+        <p>{{ 'LIB.NO_MATCHING_DESC' | translate }}</p>
+
+        <button class="btn primary" type="button" (click)="setFilter('all')">
+          {{ 'LIB.RESET_FILTER' | translate }}
+        </button>
+      </div>
+    </ng-template>
+  </section>
+
+</div>

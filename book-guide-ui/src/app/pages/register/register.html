@@ -1,0 +1,61 @@
+<div class="auth-page auth-anim">
+  <div class="auth-card">
+
+<app-auth-header
+      title="Create your Book Guide account to start saving books"
+      logoSrc="/Logo.png">
+    </app-auth-header>
+
+    <form class="form" (ngSubmit)="onSubmit()">
+
+      <div class="field">
+        <span>Full Name</span>
+        <input
+          type="text"
+          name="fullName"
+          [(ngModel)]="fullName"
+          autocomplete="name"
+          [disabled]="loading"
+          
+        />
+      </div>
+
+      <div class="field">
+        <span>Email</span>
+        <input
+          type="email"
+          name="email"
+          [(ngModel)]="email"
+          autocomplete="email"
+          [disabled]="loading"
+          required
+        />
+      </div>
+
+      <div class="field">
+        <span>Password</span>
+        <input
+          type="password"
+          name="password"
+          [(ngModel)]="password"
+          autocomplete="new-password"
+          [disabled]="loading"
+          required
+        />
+      </div>
+
+      <button class="btn primary" type="submit" [disabled]="loading">
+        {{ loading ? 'Creating...' : 'Create account' }}
+      </button>
+
+      <p class="msg error" *ngIf="error">{{ error }}</p>
+      <p class="msg success" *ngIf="success">{{ success }}</p>
+
+      <p class="foot">
+        Already have an account?
+        <a routerLink="/login">Login</a>
+      </p>
+
+    </form>
+  </div>
+</div>

@@ -1,0 +1,44 @@
+<div class="page">
+  <div class="container">
+    <div class="header">
+      <h1>Notifications</h1>
+
+      <div class="actions">
+        <button class="btn ghost" (click)="toggleUnread()">
+          {{ onlyUnread ? 'Show All' : 'Unread' }}
+        </button>
+
+        <button class="btn" (click)="markAll()" [disabled]="loading || items.length === 0">
+          Mark all read
+        </button>
+      </div>
+    </div>
+
+    <p class="hint" *ngIf="loading">Loading...</p>
+    <p class="error" *ngIf="error">{{ error }}</p>
+
+    <div class="list" *ngIf="!loading && !error">
+      <div class="empty" *ngIf="items.length === 0">
+        No notifications.
+      </div>
+
+      <div
+        class="item"
+        *ngFor="let n of items"
+        [class.unread]="!n.isRead"
+        (click)="openNotification(n)"
+      >
+        <div class="row">
+          <div class="title">{{ n.title }}</div>
+          <div class="date">{{ n.createdAt | date:'yyyy-MM-dd HH:mm' }}</div>
+        </div>
+
+        <div class="msg">{{ n.message }}</div>
+
+        <div class="meta">
+          <span class="tag unread-tag" *ngIf="!n.isRead">Unread</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

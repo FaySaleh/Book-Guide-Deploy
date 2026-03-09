@@ -1,0 +1,115 @@
+<div class="page">
+
+  <div class="top" *ngIf="!loading && data">
+    <div class="header">
+      <div class="title">
+        <h1>{{ 'DASH.TITLE' | translate }}</h1>
+        <p class="sub">{{ 'DASH.SUBTITLE' | translate }}</p>
+      </div>
+
+      <div class="user">
+        <div class="avatar">{{ (auth.currentUser?.fullName || 'U').slice(0,1).toUpperCase() }}</div>
+        <div class="uinfo">
+          <div class="uname">{{ auth.currentUser?.fullName }}</div>
+          <div class="uemail">{{ auth.currentUser?.email }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="grid stats">
+      <div class="card stat" *ngFor="let c of primaryCards">
+        <div class="stat-left">
+          <div class="stat-icon">{{ c.icon }}</div>
+          <div>
+            <!-- ملاحظة: c.label لازم يصير مفتاح ترجمة من TS -->
+            <div class="label">{{ c.label | translate }}</div>
+
+            <div class="value">
+              {{ c.value }}
+              <!-- ملاحظة: c.hint لازم يصير مفتاح ترجمة من TS -->
+              <span class="hint" *ngIf="c.hint">{{ c.hint | translate }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toggle More -->
+    <div class="more-row" *ngIf="extraCards.length">
+      <button type="button" class="btn-more" (click)="toggleMore()">
+        <span>{{ showMore ? ('DASH.SHOW_LESS' | translate) : ('DASH.SHOW_MORE' | translate) }}</span>
+        <span class="chev" [class.up]="showMore">⌄</span>
+      </button>
+    </div>
+
+    <!-- Extra Stats -->
+    <div class="grid stats" *ngIf="showMore">
+      <div class="card stat" *ngFor="let c of extraCards">
+        <div class="stat-left">
+          <div class="stat-icon">{{ c.icon }}</div>
+          <div>
+            <div class="label">{{ c.label | translate }}</div>
+            <div class="value">
+              {{ c.value }}
+              <span class="hint" *ngIf="c.hint">{{ c.hint | translate }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACHIEVEMENTS -->
+    <div class="section">
+      <div class="section-head">
+        <h2>{{ 'DASH.ACHIEVEMENTS.TITLE' | translate }}</h2>
+      </div>
+
+      <div class="grid achievements">
+        <div class="card ach"
+             *ngFor="let a of data.achievements; trackBy: trackByCode"
+             [class.locked]="!a.unlocked">
+
+          <div class="ach-top">
+            <div class="ach-icon">{{ a.icon || '🏅' }}</div>
+            <div class="ach-meta">
+             <div class="ach-title">
+  {{ ('ACH.' + a.code + '.TITLE') | translate }}
+</div>
+<div class="ach-desc">
+  {{ ('ACH.' + a.code + '.DESC') | translate }}
+</div>
+            </div>
+          </div>
+
+          <div class="progress">
+            <div class="bar" [style.width.%]="a.progressPercent"></div>
+          </div>
+
+          <div class="ach-foot">
+            <div class="nums">
+              <span class="cur">{{ a.currentValue }}</span>
+              <span class="sep">/</span>
+              <span class="tar">{{ a.targetValue ?? '-' }}</span>
+            </div>
+
+            <div class="pct">{{ a.progressPercent }}%</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="state" *ngIf="loading">
+    <div class="spinner"></div>
+    <div>{{ 'DASH.LOADING' | translate }}</div>
+  </div>
+
+  <div class="state err" *ngIf="!loading && error">
+    <div class="err-title">{{ 'DASH.ERROR_TITLE' | translate }}</div>
+    <div class="err-msg">{{ error }}</div>
+  </div>
+
+</div>

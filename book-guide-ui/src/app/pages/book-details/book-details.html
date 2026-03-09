@@ -1,0 +1,149 @@
+<div class="page">
+  <div class="container">
+
+    <div class="card">
+      <div class="layout">
+
+        <!-- LEFT-->
+        <div class="main">
+
+          <div class="hero">
+
+            <div class="cover">
+              <img
+                class="cover-img"
+                [src]="coverUrl ? coverUrl : '/placeholder-book.png'"
+                (error)="onCoverError($event)"
+                alt="cover"
+              />
+            </div>
+
+            <div class="info">
+
+              <div class="title-row">
+                <div class="title-col">
+                  <h1 class="title">{{ title }}</h1>
+                  <p class="author">{{ author }}</p>
+                </div>
+
+                <div class="title-progress" *ngIf="progress">
+                  <div class="tp-value">
+                    {{ progress.currentPage ?? 0 }} / {{ progress.totalPages ?? '-' }}
+                    <span class="tp-small">({{ progressPercent }}%)</span>
+                  </div>
+                </div>
+              </div>
+
+              <p class="desc" *ngIf="description">{{ description }}</p>
+
+              <div class="progress-card section">
+
+                <p *ngIf="loadingProgress" class="hint">{{ 'BOOK.LOADING_PROGRESS' | translate }}</p>
+                <p *ngIf="progressError" class="error">{{ progressError }}</p>
+                <p *ngIf="progressSuccess" class="success">{{ progressSuccess }}</p>
+
+                <div *ngIf="progress" class="progress-body">
+
+                  <div class="progress-grid">
+                    <div class="field">
+                      <div class="field-label">{{ 'BOOK.CURRENT_PAGE' | translate }}</div>
+                      <input
+                        class="field-input"
+                        type="number"
+                        [(ngModel)]="currentPageInput"
+                        [min]="progress.currentPage ?? 0"
+                      />
+                    </div>
+
+                    <div class="field">
+                      <div class="field-label">{{ 'BOOK.TOTAL_PAGES' | translate }}</div>
+                      <input class="field-input" type="number" [(ngModel)]="totalPagesInput" />
+                    </div>
+                  </div>
+
+                  <div class="actions">
+                    <button class="btn" type="button" (click)="saveProgress()" [disabled]="loadingProgress">
+                      {{ loadingProgress ? ('BOOK.SAVING' | translate) : ('BOOK.UPDATE_PROGRESS' | translate) }}
+                    </button>
+                  </div>
+
+                </div>
+
+                <div *ngIf="!loadingProgress && !progress && !progressError" class="hint">
+                  {{ 'BOOK.NO_PROGRESS_YET' | translate }}
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT -->
+        <aside class="stats">
+
+          <div class="stats-card">
+
+            <div class="stats-row">
+              <div class="stats-label">{{ 'BOOK.INFO.STATUS' | translate }}</div>
+              <div class="stats-value">
+                <span class="pill">{{ statusLabel(status) }}</span>
+              </div>
+            </div>
+
+            <div class="stats-row">
+              <div class="stats-label">{{ 'BOOK.INFO.RATING' | translate }}</div>
+              <div class="stats-value">
+                <div class="rating">
+                  <button
+                    type="button"
+                    class="star"
+                    *ngFor="let s of stars"
+                    [class.filled]="(rating ?? 0) >= s"
+                    (click)="setRating(s)">
+                    ★
+                  </button>
+
+                  <button
+                    type="button"
+                    class="clear-rating"
+                    *ngIf="rating"
+                    (click)="setRating(0)">
+                    {{ 'BOOK.CLEAR' | translate }}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="stats-row">
+              <div class="stats-label">{{ 'BOOK.INFO.STARTED' | translate }}</div>
+              <div class="stats-value">
+                <ng-container *ngIf="progress?.startedAt; else noStarted">
+                  {{ progress?.startedAt | date:'yyyy-MM-dd HH:mm' }}
+                </ng-container>
+                <ng-template #noStarted>-</ng-template>
+              </div>
+            </div>
+
+            <div class="stats-row">
+              <div class="stats-label">{{ 'BOOK.INFO.FINISHED' | translate }}</div>
+              <div class="stats-value">
+                <ng-container *ngIf="progress?.finishedAt; else noFinished">
+                  {{ progress?.finishedAt | date:'yyyy-MM-dd HH:mm' }}
+                </ng-container>
+                <ng-template #noFinished>-</ng-template>
+              </div>
+            </div>
+
+          </div>
+
+        </aside>
+
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,50 @@
+<div class="auth-page auth-anim">
+  <div class="auth-card">
+<app-auth-header
+      title="Welcome back"
+      subtitle="Login to continue"
+      logoSrc="/Logo.png">
+    </app-auth-header>
+
+    <form class="form" (ngSubmit)="onSubmit()">
+      <label class="field">
+        <span>Email</span>
+        <input
+          type="email"
+          [(ngModel)]="email"
+          name="email"
+          autocomplete="email"
+          required
+        />
+      </label>
+
+      <label class="field">
+        <span>Password</span>
+        <input
+          type="password"
+          [(ngModel)]="password"
+          name="password"
+          autocomplete="current-password"
+          required
+        />
+      </label>
+
+      <button class="btn primary" type="submit" [disabled]="loading">
+        {{ loading ? 'Logging in...' : 'Login' }}
+      </button>
+
+      <p *ngIf="error" class="msg error">
+        {{ error }}
+      </p>
+
+      <p class="foot">
+        New here?
+        <a routerLink="/register">Create account</a>
+      </p>
+      <div class="footer">
+  <a routerLink="/forgot-password">Forgot password?</a>
+</div>
+
+    </form>
+  </div>
+</div>
