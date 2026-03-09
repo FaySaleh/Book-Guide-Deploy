@@ -29,10 +29,12 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngular", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
         policy
-            .AllowAnyOrigin()
+            .WithOrigins(
+                "https://bookguide-ui.onrender.com"
+            )
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
