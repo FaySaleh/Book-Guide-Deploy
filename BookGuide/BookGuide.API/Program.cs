@@ -60,6 +60,7 @@ app.UseSwaggerUI();
 app.UseCors("AllowAngular");
 
 app.UseHttpsRedirection();
+app.UseCors("AllowFrontend");
 
 app.UseAuthorization();
 
