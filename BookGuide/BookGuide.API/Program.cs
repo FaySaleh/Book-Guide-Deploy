@@ -42,16 +42,16 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-//using (var scope = app.Services.CreateScope())
-//{
-//    var db = scope.ServiceProvider.GetRequiredService<BookGuideDbContext>();
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<BookGuideDbContext>();
 
-//    Console.WriteLine("DB: " + db.Database.GetDbConnection().DataSource);
-//    Console.WriteLine("DatabaseName: " + db.Database.GetDbConnection().Database);
+    Console.WriteLine("DB: " + db.Database.GetDbConnection().DataSource);
+    Console.WriteLine("DatabaseName: " + db.Database.GetDbConnection().Database);
 
-//    await db.Database.MigrateAsync();
-//    await AchievementsSeeder.SeedAsync(db);
-//}
+    await db.Database.MigrateAsync();
+    await AchievementsSeeder.SeedAsync(db);
+}
 
 
 app.UseSwagger();
