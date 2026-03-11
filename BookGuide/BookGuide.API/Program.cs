@@ -18,7 +18,15 @@ builder.Services.AddScoped<IEmailSender, EmailSender>();
 builder.Services.AddScoped<NotificationsService>();
 
 builder.Services.AddDbContext<BookGuideDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(10),
+                errorNumbersToAdd: null);
+        }));
 
 builder.Services.AddHostedService<ReminderHostedService>();
 
