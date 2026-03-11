@@ -47,11 +47,18 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<BookGuideDbContext>();
 
-    Console.WriteLine("DB: " + db.Database.GetDbConnection().DataSource);
-    Console.WriteLine("DatabaseName: " + db.Database.GetDbConnection().Database);
+    try
+    {
+        Console.WriteLine("DB: " + db.Database.GetDbConnection().DataSource);
+        Console.WriteLine("DatabaseName: " + db.Database.GetDbConnection().Database);
 
-    await db.Database.MigrateAsync();
-    await AchievementsSeeder.SeedAsync(db);
+        await db.Database.MigrateAsync();
+        await AchievementsSeeder.SeedAsync(db);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Startup migration failed: " + ex.Message);
+    }
 }
 
 app.UseSwagger();
