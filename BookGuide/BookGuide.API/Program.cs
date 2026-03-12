@@ -1,31 +1,8 @@
-using BookGuide.API.Data;
-using BookGuide.API.Services;
-using Microsoft.EntityFrameworkCore;
-using System.Net;
-
-ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddScoped<AchievementsService>();
-builder.Services.AddScoped<DashboardService>();
-builder.Services.AddScoped<IEmailSender, EmailSender>();
-builder.Services.AddScoped<NotificationsService>();
-
-builder.Services.AddDbContext<BookGuideDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        sqlOptions =>
-        {
-            sqlOptions.EnableRetryOnFailure(
-                maxRetryCount: 5,
-                maxRetryDelay: TimeSpan.FromSeconds(10),
-                errorNumbersToAdd: null);
-        }));
-
-//builder.Services.AddHostedService<ReminderHostedService>();
-
-builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -43,47 +20,14 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-/*using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<BookGuideDbContext>();
-
-    try
-    {
-        Console.WriteLine("DB: " + db.Database.GetDbConnection().DataSource);
-        Console.WriteLine("DatabaseName: " + db.Database.GetDbConnection().Database);
-
-        var created = await db.Database.EnsureCreatedAsync();
-        Console.WriteLine("EnsureCreated result: " + created);
-
-        await AchievementsSeeder.SeedAsync(db);
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine("Startup DB creation failed: " + ex);
-    }
-}*/
-
-/*using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<BookGuideDbContext>();
-
-    Console.WriteLine("DB: " + db.Database.GetDbConnection().DataSource);
-    Console.WriteLine("DatabaseName: " + db.Database.GetDbConnection().Database);
-
-    await db.Database.MigrateAsync();
-    Console.WriteLine("Database migration applied");
-
-    await AchievementsSeeder.SeedAsync(db);
-    Console.WriteLine("Seed finished");
-}*/
-
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 
-app.UseAuthorization();
+app.MapGet("/", () => "BookGuide API is running");
+app.MapGet("/ping", () => "pong");
 
 app.MapControllers();
 
