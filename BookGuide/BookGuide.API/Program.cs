@@ -23,7 +23,7 @@ builder.Services.AddDbContext<BookGuideDbContext>(options =>
                 errorNumbersToAdd: null);
         }));
 
-builder.Services.AddHostedService<ReminderHostedService>();
+// builder.Services.AddHostedService<ReminderHostedService>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
@@ -42,8 +42,6 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
-
-// builder.Services.AddHostedService<ReminderHostedService>();
 
 using (var scope = app.Services.CreateScope())
 {
