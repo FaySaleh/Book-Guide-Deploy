@@ -63,7 +63,7 @@ var app = builder.Build();
     }
 }*/
 
-using (var scope = app.Services.CreateScope())
+/*using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<BookGuideDbContext>();
 
@@ -75,7 +75,7 @@ using (var scope = app.Services.CreateScope())
 
     await AchievementsSeeder.SeedAsync(db);
     Console.WriteLine("Seed finished");
-}
+}*/
 
 app.UseSwagger();
 app.UseSwaggerUI();
