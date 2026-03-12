@@ -23,7 +23,7 @@ builder.Services.AddDbContext<BookGuideDbContext>(options =>
                 errorNumbersToAdd: null);
         }));
 
-// builder.Services.AddHostedService<ReminderHostedService>();
+builder.Services.AddHostedService<ReminderHostedService>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
@@ -59,7 +59,7 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        Console.WriteLine("Startup DB creation failed: " + ex.ToString());
+        Console.WriteLine("Startup DB creation failed: " + ex);
     }
 }
 
