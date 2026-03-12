@@ -52,12 +52,12 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine("DB: " + db.Database.GetDbConnection().DataSource);
         Console.WriteLine("DatabaseName: " + db.Database.GetDbConnection().Database);
 
-        await db.Database.MigrateAsync();
+        await db.Database.EnsureCreatedAsync();
         await AchievementsSeeder.SeedAsync(db);
     }
     catch (Exception ex)
     {
-        Console.WriteLine("Startup migration failed: " + ex.Message);
+        Console.WriteLine("Startup DB creation failed: " + ex.ToString());
     }
 }
 
