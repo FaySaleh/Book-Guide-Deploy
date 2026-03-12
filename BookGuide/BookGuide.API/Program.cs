@@ -43,7 +43,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
+/*using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<BookGuideDbContext>();
 
@@ -61,6 +61,20 @@ using (var scope = app.Services.CreateScope())
     {
         Console.WriteLine("Startup DB creation failed: " + ex);
     }
+}*/
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<BookGuideDbContext>();
+
+    Console.WriteLine("DB: " + db.Database.GetDbConnection().DataSource);
+    Console.WriteLine("DatabaseName: " + db.Database.GetDbConnection().Database);
+
+    var created = await db.Database.EnsureCreatedAsync();
+    Console.WriteLine("EnsureCreated result: " + created);
+
+    await AchievementsSeeder.SeedAsync(db);
+    Console.WriteLine("Seed finished");
 }
 
 app.UseSwagger();
