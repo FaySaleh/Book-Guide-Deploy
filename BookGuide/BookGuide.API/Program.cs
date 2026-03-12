@@ -70,8 +70,8 @@ using (var scope = app.Services.CreateScope())
     Console.WriteLine("DB: " + db.Database.GetDbConnection().DataSource);
     Console.WriteLine("DatabaseName: " + db.Database.GetDbConnection().Database);
 
-    var created = await db.Database.EnsureCreatedAsync();
-    Console.WriteLine("EnsureCreated result: " + created);
+    await db.Database.MigrateAsync();
+    Console.WriteLine("Database migration applied");
 
     await AchievementsSeeder.SeedAsync(db);
     Console.WriteLine("Seed finished");
