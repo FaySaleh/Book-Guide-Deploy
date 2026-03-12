@@ -43,6 +43,8 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// builder.Services.AddHostedService<ReminderHostedService>();
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<BookGuideDbContext>();
@@ -52,7 +54,9 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine("DB: " + db.Database.GetDbConnection().DataSource);
         Console.WriteLine("DatabaseName: " + db.Database.GetDbConnection().Database);
 
-        await db.Database.EnsureCreatedAsync();
+        var created = await db.Database.EnsureCreatedAsync();
+        Console.WriteLine("EnsureCreated result: " + created);
+
         await AchievementsSeeder.SeedAsync(db);
     }
     catch (Exception ex)
