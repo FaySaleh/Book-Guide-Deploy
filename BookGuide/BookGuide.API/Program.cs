@@ -50,6 +50,8 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 
+app.UseAuthorization();
+
 app.MapGet("/", () => "BookGuide API is running");
 app.MapGet("/ping", () => "pong");
 
