@@ -25,6 +25,25 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<BookGuideDbContext>();
+
+    try
+    {
+        Console.WriteLine("DB: " + db.Database.GetDbConnection().DataSource);
+        Console.WriteLine("DatabaseName: " + db.Database.GetDbConnection().Database);
+
+        await db.Database.EnsureCreatedAsync();
+
+        Console.WriteLine("Database ensured successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Startup DB creation failed: " + ex);
+    }
+}
+
 app.UseSwagger();
 app.UseSwaggerUI();
 
