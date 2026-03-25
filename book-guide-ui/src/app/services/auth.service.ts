@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface AuthUser {
   id: number;
@@ -27,7 +28,7 @@ export class AuthService {
 
   register(fullName: string, email: string, password: string): Observable<AuthUser> {
     return this.http
-      .post<AuthUser>('/api/Auth/register', { fullName, email, password })
+      .post<AuthUser>(`${environment.apiBaseUrl}/Auth/register`, { fullName, email, password })
       .pipe(
         tap(user => {
           this.saveUser(user);
@@ -37,27 +38,30 @@ export class AuthService {
 
   login(email: string, password: string): Observable<AuthUser> {
     return this.http
-      .post<AuthUser>('/api/Auth/login', { email, password })
-      .pipe(tap(user => this.saveUser(user)));
+      .post<AuthUser>(`${environment.apiBaseUrl}/Auth/login`, { email, password })
+      .pipe(
+        tap(user => {
+          this.saveUser(user);
+        })
+      );
   }
 
-    forgotPassword(email: string): Observable<any> {
-    return this.http.post<any>('/api/Auth/forgot-password', { email });
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post<any>(`${environment.apiBaseUrl}/Auth/forgot-password`, { email });
   }
 
   resetPassword(token: string, newPassword: string): Observable<any> {
-    return this.http.post<any>('/api/Auth/reset-password', { token, newPassword });
+    return this.http.post<any>(`${environment.apiBaseUrl}/Auth/reset-password`, { token, newPassword });
   }
-
 
   logout(): void {
     localStorage.removeItem(this.STORAGE_KEY);
     this.userSubject.next(null);
   }
-getUserId(): number {
-  return this.currentUser?.id ?? 0;
-}
 
+  getUserId(): number {
+    return this.currentUser?.id ?? 0;
+  }
 
   private saveUser(user: AuthUser): void {
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(user));
@@ -73,4 +77,3 @@ getUserId(): number {
     }
   }
 }
-
