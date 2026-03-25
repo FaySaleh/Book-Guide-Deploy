@@ -36,7 +36,7 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine("DB: " + db.Database.GetDbConnection().DataSource);
         Console.WriteLine("DatabaseName: " + db.Database.GetDbConnection().Database);
 
-        await db.Database.EnsureCreatedAsync();
+        //await db.Database.EnsureCreatedAsync();
 
         Console.WriteLine("Database ensured successfully.");
     }
