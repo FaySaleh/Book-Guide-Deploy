@@ -42,7 +42,6 @@ export class BooksComponent implements OnInit {
     this.loadMyLibrary();
   }
 
-
   loadMyLibrary() {
     const user = this.auth.currentUser;
     if (!user) {
@@ -101,7 +100,6 @@ export class BooksComponent implements OnInit {
     return 'Unknown';
   }
 
-
   onCoverError(e: Event) {
     const img = e.target as HTMLImageElement;
 
@@ -109,7 +107,6 @@ export class BooksComponent implements OnInit {
 
     img.src = '/placeholder-book.png';
   }
-
 
   searchExternal() {
     const term = (this.searchTerm ?? '').trim();
@@ -131,10 +128,12 @@ export class BooksComponent implements OnInit {
       )
       .subscribe({
         next: (res) => {
-          this.results = res ?? [];
+          console.log('SEARCH RESULT AFTER MAPPING:', res);
+          this.results = (res ?? []).filter(b => !!b.title && b.title.trim().length > 0);
           this.zone.run(() => this.cdr.detectChanges());
         },
         error: (err) => {
+          console.error('SEARCH ERROR:', err);
           this.searchError =
             (typeof err?.error === 'string' ? err.error : '') || 'Search failed';
           this.zone.run(() => this.cdr.detectChanges());
@@ -159,10 +158,10 @@ export class BooksComponent implements OnInit {
     this.userBooksApi
       .add({
         userId: user.id,
-        externalBookId: (b as any).externalBookId,
+        externalBookId: b.externalBookId,
         title: b.title ?? '',
         author: b.author ?? null,
-        coverUrl: (b as any).coverUrl ?? null,
+        coverUrl: b.coverUrl ?? null,
         status: 1,
         rating: null
       })
@@ -178,7 +177,7 @@ export class BooksComponent implements OnInit {
   }
 
   deleteFromMyLibrary(b: UserBook) {
-    const id = (b as any).id; 
+    const id = (b as any).id;
     if (!id) return;
 
     const ok = confirm(`Delete "${b.title}" from your library?`);
@@ -195,5 +194,4 @@ export class BooksComponent implements OnInit {
       }
     });
   }
-
 }

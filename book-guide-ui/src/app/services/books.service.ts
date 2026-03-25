@@ -6,8 +6,7 @@ export interface ExternalBook {
   externalBookId: string;
   title: string;
   author?: string;
-  coverUrl?: string;   
-
+  coverUrl?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -15,15 +14,45 @@ export class BooksService {
   constructor(private http: HttpClient) {}
 
   search(title: string): Observable<ExternalBook[]> {
-    const params = new HttpParams().set('title', title); 
+    const params = new HttpParams().set('title', title.trim());
 
-    return this.http.get<any[]>('/api/Books/search', { params }).pipe(
-      map(arr => (arr ?? []).map(x => ({
-        externalBookId: x.externalBookId ?? x.externalBookID ?? '',
-        title: x.title ?? '',
-        author: x.author ?? '',
-        coverUrl: x.coverUrl ?? null    
-      })))
+    return this.http.get<any>('/api/Books/search', { params }).pipe(
+      map((res) => {
+        console.log('Books search raw response:', res);
+
+        const arr = Array.isArray(res)
+          ? res
+          : Array.isArray(res?.docs)
+          ? res.docs
+          : Array.isArray(res?.items)
+          ? res.items
+          : [];
+
+        return arr.map((x: any) => ({
+          externalBookId:
+            x.externalBookId ??
+            x.externalBookID ??
+            x.id ??
+            x.key ??
+            '',
+
+          title:
+            x.title ??
+            x.name ??
+            'Untitled',
+
+          author:
+            x.author ??
+            x.authorName ??
+            (Array.isArray(x.author_name) ? x.author_name.join(', ') : x.author_name) ??
+            'Unknown author',
+
+          coverUrl:
+            x.coverUrl ??
+            x.cover ??
+            (x.cover_i ? `https://covers.openlibrary.org/b/id/${x.cover_i}-M.jpg` : null)
+        }));
+      })
     );
   }
 }
