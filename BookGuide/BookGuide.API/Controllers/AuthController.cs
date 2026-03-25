@@ -5,10 +5,8 @@ using BookGuide.API.Models;
 using BookGuide.API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Security.Cryptography;
 using System.Text;
-using BCrypt.Net;
 
 namespace BookGuide.API.Controllers
 {
@@ -27,20 +25,35 @@ namespace BookGuide.API.Controllers
             _config = config;
         }
 
-        // ✅ FIX: إضافة HttpPost
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequest dto)
         {
             try
             {
-                if (await _db.Users.AnyAsync(x => x.Email == dto.Email))
+                if (dto == null)
+                    return BadRequest("Invalid request.");
+
+                var fullName = dto.FullName?.Trim();
+                var email = dto.Email?.Trim().ToLower();
+                var password = dto.Password?.Trim();
+
+                if (string.IsNullOrWhiteSpace(fullName) ||
+                    string.IsNullOrWhiteSpace(email) ||
+                    string.IsNullOrWhiteSpace(password))
+                {
+                    return BadRequest("Full name, email, and password are required.");
+                }
+
+                var exists = await _db.Users.AnyAsync(x => x.Email.ToLower() == email);
+                if (exists)
                     return BadRequest("Email already exists");
 
                 var user = new User
                 {
-                    FullName = dto.FullName,
-                    Email = dto.Email,
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+                    FullName = fullName,
+                    Email = email,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 _db.Users.Add(user);
@@ -55,6 +68,9 @@ namespace BookGuide.API.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine("REGISTER ERROR:");
+                Console.WriteLine(ex);
+
                 return StatusCode(500, ex.ToString());
             }
         }
@@ -74,7 +90,6 @@ namespace BookGuide.API.Controllers
             if (user == null)
                 return Unauthorized("Invalid email or password.");
 
-            // ⚠️ FIX مهم: استخدام BCrypt بدل SHA256
             if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
                 return Unauthorized("Invalid email or password.");
 

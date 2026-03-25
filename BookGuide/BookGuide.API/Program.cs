@@ -1,25 +1,30 @@
 using BookGuide.API.Data;
-using BookGuide.API.Services;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<BookGuideDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+// ?? ??? ???? (??? ????? 500 ????)
+builder.Services.AddHttpClient();
 
+// Database
+builder.Services.AddDbContext<BookGuideDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Controllers
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<IEmailSender, EmailSender>();
 
+// CORS (???? ?? Render)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy
-            .WithOrigins("https://bookguide-ui.onrender.com")
+            .WithOrigins(
+                "https://bookguide-ui.onrender.com",
+                "http://localhost:4200"
+            )
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -27,26 +32,12 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI();
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
-
+// Middleware
 app.UseCors("AllowFrontend");
+
+app.UseHttpsRedirection();
 app.UseAuthorization();
 
-app.MapGet("/", () => "BookGuide API is running");
-app.MapGet("/ping", () => "pong");
-
 app.MapControllers();
-
-var port = Environment.GetEnvironmentVariable("PORT");
-if (!string.IsNullOrEmpty(port))
-{
-    app.Urls.Add($"http://*:{port}");
-}
 
 app.Run();

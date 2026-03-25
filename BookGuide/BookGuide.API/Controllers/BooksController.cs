@@ -18,62 +18,79 @@ namespace BookGuide.API.Controllers
         [HttpGet("search")]
         public async Task<IActionResult> Search([FromQuery] string title)
         {
-            if (string.IsNullOrWhiteSpace(title))
-                return BadRequest("title is required.");
-
-            var client = _httpClientFactory.CreateClient();
-
-            var url = $"https://openlibrary.org/search.json?title={Uri.EscapeDataString(title)}";
-
-            using var response = await client.GetAsync(url);
-            if (!response.IsSuccessStatusCode)
-                return StatusCode((int)response.StatusCode, "OpenLibrary request failed.");
-
-            await using var stream = await response.Content.ReadAsStreamAsync();
-            using var doc = await JsonDocument.ParseAsync(stream);
-
-            if (!doc.RootElement.TryGetProperty("docs", out var docs))
-                return Ok(Array.Empty<BookSearchResultDto>());
-
-            var results = new List<BookSearchResultDto>();
-
-            foreach (var item in docs.EnumerateArray().Take(20))
+            try
             {
-                var key = item.TryGetProperty("key", out var keyProp) ? keyProp.GetString() : null;
-                if (string.IsNullOrWhiteSpace(key))
-                    continue;
+                if (string.IsNullOrWhiteSpace(title))
+                    return BadRequest("title is required.");
 
-                var externalId = key.Replace("/works/", "").Trim(); 
+                var client = _httpClientFactory.CreateClient();
 
-                var bookTitle = item.TryGetProperty("title", out var titleProp) ? titleProp.GetString() : null;
-                if (string.IsNullOrWhiteSpace(bookTitle))
-                    continue;
+                var url = $"https://openlibrary.org/search.json?title={Uri.EscapeDataString(title)}";
 
-                string? author = null;
-                if (item.TryGetProperty("author_name", out var authorProp) &&
-                    authorProp.ValueKind == JsonValueKind.Array &&
-                    authorProp.GetArrayLength() > 0)
+                using var response = await client.GetAsync(url);
+
+                if (!response.IsSuccessStatusCode)
                 {
-                    author = authorProp[0].GetString();
+                    var body = await response.Content.ReadAsStringAsync();
+                    return StatusCode((int)response.StatusCode, $"OpenLibrary error: {body}");
                 }
 
-                string? coverUrl = null;
-                if (item.TryGetProperty("cover_i", out var coverProp) && coverProp.ValueKind == JsonValueKind.Number)
+                await using var stream = await response.Content.ReadAsStreamAsync();
+                using var doc = await JsonDocument.ParseAsync(stream);
+
+                if (!doc.RootElement.TryGetProperty("docs", out var docs))
+                    return Ok(Array.Empty<BookSearchResultDto>());
+
+                var results = new List<BookSearchResultDto>();
+
+                foreach (var item in docs.EnumerateArray().Take(20))
                 {
-                    var coverId = coverProp.GetInt32();
-                    coverUrl = $"https://covers.openlibrary.org/b/id/{coverId}-L.jpg";
+                    var key = item.TryGetProperty("key", out var keyProp) ? keyProp.GetString() : null;
+                    if (string.IsNullOrWhiteSpace(key))
+                        continue;
+
+                    var externalId = key.Replace("/works/", "").Trim();
+
+                    var bookTitle = item.TryGetProperty("title", out var titleProp) ? titleProp.GetString() : null;
+                    if (string.IsNullOrWhiteSpace(bookTitle))
+                        continue;
+
+                    string? author = "Unknown author";
+
+                    if (item.TryGetProperty("author_name", out var authorProp) &&
+                        authorProp.ValueKind == JsonValueKind.Array &&
+                        authorProp.GetArrayLength() > 0)
+                    {
+                        author = authorProp[0].GetString() ?? "Unknown author";
+                    }
+
+                    string? coverUrl = null;
+
+                    if (item.TryGetProperty("cover_i", out var coverProp) &&
+                        coverProp.ValueKind == JsonValueKind.Number)
+                    {
+                        var coverId = coverProp.GetInt32();
+                        coverUrl = $"https://covers.openlibrary.org/b/id/{coverId}-L.jpg";
+                    }
+
+                    results.Add(new BookSearchResultDto
+                    {
+                        ExternalBookId = externalId,
+                        Title = bookTitle,
+                        Author = author,
+                        CoverUrl = coverUrl
+                    });
                 }
 
-                results.Add(new BookSearchResultDto
-                {
-                    ExternalBookId = externalId,
-                    Title = bookTitle,
-                    Author = author,
-                    CoverUrl = coverUrl
-                });
+                return Ok(results);
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("BOOK SEARCH ERROR:");
+                Console.WriteLine(ex.ToString());
 
-            return Ok(results);
+                return StatusCode(500, ex.ToString());
+            }
         }
     }
 }
