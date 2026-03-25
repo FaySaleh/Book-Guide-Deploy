@@ -68,11 +68,11 @@
 
       <div class="meta">
         <div class="top">
-          <h3 class="title" [title]="b.title">{{ b.title || 'Untitled' }}</h3>
+<h3>{{ b.title || 'Untitled' }}</h3>
           <span class="badge" data-status="external">{{ 'LIB.EXTERNAL' | translate }}</span>
         </div>
 
-        <p class="author">{{ b.author || 'Unknown author' }}</p>
+        <p>{{ b.author || 'Unknown author' }}</p>
 
         <div class="actions">
           <button class="btn primary" type="button" (click)="addToMyLibrary(b)">

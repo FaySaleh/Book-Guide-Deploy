@@ -126,18 +126,20 @@ export class BooksComponent implements OnInit {
           this.zone.run(() => this.cdr.detectChanges());
         })
       )
+
       .subscribe({
-        next: (res) => {
-          console.log('SEARCH RESULT AFTER MAPPING:', res);
-          this.results = (res ?? []).filter(b => !!b.title && b.title.trim().length > 0);
-          this.zone.run(() => this.cdr.detectChanges());
-        },
+next: (res) => {
+  console.log('SEARCH RESULT AFTER MAPPING:', res);
+
+  this.results = (res ?? []).filter(b => b.title && b.title.trim().length > 0);
+
+  this.cdr.detectChanges(); // يكفي هذا
+},
         error: (err) => {
           console.error('SEARCH ERROR:', err);
           this.searchError =
             (typeof err?.error === 'string' ? err.error : '') || 'Search failed';
-          this.zone.run(() => this.cdr.detectChanges());
-        }
+this.cdr.detectChanges();        }
       });
   }
 
