@@ -1,4 +1,5 @@
 using BookGuide.API.Data;
+using BookGuide.API.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,11 +7,12 @@ using Microsoft.Extensions.DependencyInjection;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<BookGuideDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 builder.Services.AddCors(options =>
 {
@@ -40,7 +42,7 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        Console.WriteLine("Startup DB creation failed: " + ex);
+        Console.WriteLine("DB ERROR FULL: " + ex.ToString());
     }
 }
 

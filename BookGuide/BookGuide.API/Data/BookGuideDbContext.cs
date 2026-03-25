@@ -25,7 +25,7 @@ namespace BookGuide.API.Data
                 e.Property(x => x.Message).HasMaxLength(600).IsRequired();
                 e.Property(x => x.Type).HasMaxLength(100).IsRequired();
                 e.Property(x => x.IsRead).HasDefaultValue(false);
-                e.Property(x => x.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                e.Property(x => x.CreatedAt).HasDefaultValueSql("NOW()");
                 e.HasOne(x => x.User)
                  .WithMany()
                  .HasForeignKey(x => x.UserId)

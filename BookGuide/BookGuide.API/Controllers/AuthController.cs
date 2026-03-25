@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Security.Cryptography;
 using System.Text;
-using static System.Net.WebRequestMethods;
+using BCrypt.Net;
 
 namespace BookGuide.API.Controllers
 {
@@ -20,7 +20,6 @@ namespace BookGuide.API.Controllers
         private readonly IEmailSender _email;
         private readonly IConfiguration _config;
 
-
         public AuthController(BookGuideDbContext db, IEmailSender email, IConfiguration config)
         {
             _db = db;
@@ -28,40 +27,36 @@ namespace BookGuide.API.Controllers
             _config = config;
         }
 
+        // ✅ FIX: إضافة HttpPost
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterRequest request)
+        public async Task<IActionResult> Register(RegisterRequest dto)
         {
-            if (string.IsNullOrWhiteSpace(request.FullName) ||
-                string.IsNullOrWhiteSpace(request.Email) ||
-                string.IsNullOrWhiteSpace(request.Password))
+            try
             {
-                return BadRequest("FullName, Email, Password are required.");
+                if (await _db.Users.AnyAsync(x => x.Email == dto.Email))
+                    return BadRequest("Email already exists");
+
+                var user = new User
+                {
+                    FullName = dto.FullName,
+                    Email = dto.Email,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+                };
+
+                _db.Users.Add(user);
+                await _db.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    user.Id,
+                    user.FullName,
+                    user.Email
+                });
             }
-
-            var email = request.Email.Trim().ToLower();
-
-            var exists = await _db.Users.AnyAsync(u => u.Email.ToLower() == email);
-            if (exists)
-                return Conflict("Email already exists.");
-
-            var user = new User
+            catch (Exception ex)
             {
-                FullName = request.FullName.Trim(),
-                Email = email,
-                PasswordHash = HashPassword(request.Password),
-                CreatedAt = DateTime.Now
-            };
-
-            _db.Users.Add(user);
-            await _db.SaveChangesAsync();
-
-            return Ok(new
-            {
-                user.Id,
-                user.FullName,
-                user.Email,
-                user.CreatedAt
-            });
+                return StatusCode(500, ex.ToString());
+            }
         }
 
         [HttpPost("login")]
@@ -79,8 +74,8 @@ namespace BookGuide.API.Controllers
             if (user == null)
                 return Unauthorized("Invalid email or password.");
 
-            var passwordHash = HashPassword(request.Password);
-            if (user.PasswordHash != passwordHash)
+            // ⚠️ FIX مهم: استخدام BCrypt بدل SHA256
+            if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
                 return Unauthorized("Invalid email or password.");
 
             return Ok(new
@@ -91,14 +86,6 @@ namespace BookGuide.API.Controllers
             });
         }
 
-        private static string HashPassword(string password)
-        {
-            using var sha = SHA256.Create();
-            var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
-            return Convert.ToHexString(bytes);
-        }
-
-
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest dto)
         {
@@ -108,10 +95,9 @@ namespace BookGuide.API.Controllers
 
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email);
             if (user == null)
-                return Ok(); 
+                return Ok();
 
             var token = Guid.NewGuid().ToString("N");
-
             var tokenHash = Sha256(token);
 
             var resetToken = new PasswordResetToken
@@ -130,7 +116,6 @@ namespace BookGuide.API.Controllers
             var html = EmailTemplates.ResetPasswordHtml(
                 "BookGuide",
                 "https://i.ibb.co/TMzSkvpW/Logo.png",
-
                 user.FullName,
                 resetUrl
             );
@@ -143,8 +128,6 @@ namespace BookGuide.API.Controllers
 
             return Ok();
         }
-
-
 
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest req)
@@ -167,7 +150,7 @@ namespace BookGuide.API.Controllers
             if (record == null)
                 return BadRequest("Token is invalid or expired.");
 
-            record.User.PasswordHash = HashPassword(req.NewPassword);
+            record.User.PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.NewPassword);
 
             record.IsUsed = true;
             record.UsedAt = now;
@@ -185,4 +168,3 @@ namespace BookGuide.API.Controllers
         }
     }
 }
-   
