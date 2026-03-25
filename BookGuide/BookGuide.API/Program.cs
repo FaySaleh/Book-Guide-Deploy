@@ -27,36 +27,26 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<BookGuideDbContext>();
-
-    try
-    {
-        Console.WriteLine("DB: " + db.Database.GetDbConnection().DataSource);
-        Console.WriteLine("DatabaseName: " + db.Database.GetDbConnection().Database);
-
-        //await db.Database.EnsureCreatedAsync();
-
-        Console.WriteLine("Database ensured successfully.");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine("DB ERROR FULL: " + ex.ToString());
-    }
-}
-
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
-app.UseCors("AllowFrontend");
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
+app.UseCors("AllowFrontend");
 app.UseAuthorization();
 
 app.MapGet("/", () => "BookGuide API is running");
 app.MapGet("/ping", () => "pong");
 
 app.MapControllers();
+
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port))
+{
+    app.Urls.Add($"http://*:{port}");
+}
 
 app.Run();
