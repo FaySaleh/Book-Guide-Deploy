@@ -16,17 +16,19 @@ export class BooksService {
   search(title: string): Observable<ExternalBook[]> {
     const params = new HttpParams().set('title', title.trim());
 
-    return this.http.get<any>('/api/Books/search', { params }).pipe(
-      map((res) => {
+    return this.http.get<any>('https://localhost:7250/api/Books/search', { params }).pipe(
+      map((res: any) => {
         console.log('Books search raw response:', res);
 
-        const arr = Array.isArray(res)
-          ? res
-          : Array.isArray(res?.docs)
-          ? res.docs
-          : Array.isArray(res?.items)
-          ? res.items
-          : [];
+        let arr: any[] = [];
+
+        if (Array.isArray(res)) {
+          arr = res;
+        } else if (res && Array.isArray(res.docs)) {
+          arr = res.docs;
+        } else if (res && Array.isArray(res.items)) {
+          arr = res.items;
+        }
 
         return arr.map((x: any) => ({
           externalBookId:
