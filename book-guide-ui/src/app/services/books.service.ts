@@ -32,24 +32,34 @@ export class BooksService {
           externalBookId:
             x.externalBookId ??
             x.externalBookID ??
+            x.ExternalBookId ??
+            x.ExternalBookID ??
             x.id ??
+            x.Id ??
             x.key ??
+            x.Key ??
             '',
 
           title:
             x.title ??
+            x.Title ??
             x.name ??
+            x.Name ??
             'Untitled',
 
           author:
             x.author ??
+            x.Author ??
             x.authorName ??
+            x.AuthorName ??
             (Array.isArray(x.author_name) ? x.author_name.join(', ') : x.author_name) ??
             'Unknown author',
 
           coverUrl:
             x.coverUrl ??
+            x.CoverUrl ??
             x.cover ??
+            x.Cover ??
             (x.cover_i ? `https://covers.openlibrary.org/b/id/${x.cover_i}-M.jpg` : null)
         }));
       })
