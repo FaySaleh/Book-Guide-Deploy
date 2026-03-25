@@ -49,8 +49,10 @@ export class LoginComponent {
       )
       .subscribe({
         next: () => {
-          this.router.navigateByUrl('/books');
-        },
+  setTimeout(() => {
+    this.router.navigateByUrl('/books');
+  }, 0);
+},
         error: (err) => {
           console.log('LOGIN ERROR =>', err);
 
