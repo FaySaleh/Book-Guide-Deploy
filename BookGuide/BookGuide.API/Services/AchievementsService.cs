@@ -19,12 +19,13 @@ namespace BookGuide.API.Services
                 .Where(x => x.UserId == userId)
                 .ToListAsync();
 
-            var finishedCount = books.Count(x => x.Status == 2 /* Finished */);
+            var finishedCount = books.Count(x => x.Status == 2);
             var pagesRead = books.Sum(x => x.CurrentPage ?? 0);
-
             var streak = CalculateStreakDays(books);
 
-            var achievements = await _db.Achievements.AsNoTracking().ToListAsync();
+            var achievements = await _db.Achievements
+                .AsNoTracking()
+                .ToListAsync();
 
             var unlockedIds = await _db.UserAchievements
                 .Where(x => x.UserId == userId)
@@ -35,7 +36,8 @@ namespace BookGuide.API.Services
 
             foreach (var a in achievements)
             {
-                if (unlockedIds.Contains(a.Id)) continue;
+                if (unlockedIds.Contains(a.Id))
+                    continue;
 
                 var ok = a.Code switch
                 {
@@ -47,10 +49,12 @@ namespace BookGuide.API.Services
                     _ => false
                 };
 
-                if (ok) toUnlock.Add(a.Id);
+                if (ok)
+                    toUnlock.Add(a.Id);
             }
 
-            if (toUnlock.Count == 0) return;
+            if (toUnlock.Count == 0)
+                return;
 
             var now = DateTime.UtcNow;
 
@@ -76,7 +80,8 @@ namespace BookGuide.API.Services
                 .Distinct()
                 .ToHashSet();
 
-            if (days.Count == 0) return 0;
+            if (days.Count == 0)
+                return 0;
 
             var streak = 0;
             var cursor = DateTime.UtcNow.Date;
