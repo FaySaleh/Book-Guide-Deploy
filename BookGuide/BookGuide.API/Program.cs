@@ -9,12 +9,16 @@ builder.Services.AddDbContext<BookGuideDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Services
+builder.Services.AddHttpClient();
+
 builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<NotificationsService>();
 builder.Services.AddScoped<AchievementsService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+
 
 builder.Services.AddCors(options =>
 {
