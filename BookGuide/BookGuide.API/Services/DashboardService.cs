@@ -39,6 +39,11 @@ namespace BookGuide.API.Services
 
             var allAchievements = await _db.Achievements.ToListAsync();
 
+            Console.WriteLine("=== DASHBOARD DEBUG ===");
+            Console.WriteLine("UserId: " + userId);
+            Console.WriteLine("Books count: " + userBooks.Count);
+            Console.WriteLine("Achievements in DB: " + allAchievements.Count);
+
             var unlockedAchievements = await _db.UserAchievements
                 .Where(x => x.UserId == userId)
                 .ToListAsync();
@@ -76,6 +81,8 @@ namespace BookGuide.API.Services
                     progressPercent = progressPercent
                 };
             }).ToList();
+
+            Console.WriteLine("Returned achievements count: " + achievements.Count);
 
             return new
             {
