@@ -1,9 +1,9 @@
-using BookGuide.API.Data;
+﻿using BookGuide.API.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ?? ??? ???? (??? ????? 500 ????)
+// 🔥 مهم جدًا (سبب مشكلة 500 عندك)
 builder.Services.AddHttpClient();
 
 // Database
@@ -15,7 +15,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// CORS (???? ?? Render)
+// CORS (لازم لـ Render)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>

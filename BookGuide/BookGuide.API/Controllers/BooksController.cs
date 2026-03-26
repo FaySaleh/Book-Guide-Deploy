@@ -26,19 +26,18 @@ namespace BookGuide.API.Controllers
                 var client = _httpClientFactory.CreateClient();
 
                 var url = $"https://openlibrary.org/search.json?title={Uri.EscapeDataString(title)}";
-
                 using var response = await client.GetAsync(url);
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    var body = await response.Content.ReadAsStringAsync();
-                    return StatusCode((int)response.StatusCode, $"OpenLibrary error: {body}");
+                    var errorBody = await response.Content.ReadAsStringAsync();
+                    return StatusCode((int)response.StatusCode, $"OpenLibrary request failed: {errorBody}");
                 }
 
                 await using var stream = await response.Content.ReadAsStreamAsync();
                 using var doc = await JsonDocument.ParseAsync(stream);
 
-                if (!doc.RootElement.TryGetProperty("docs", out var docs))
+                if (!doc.RootElement.TryGetProperty("docs", out var docs) || docs.ValueKind != JsonValueKind.Array)
                     return Ok(Array.Empty<BookSearchResultDto>());
 
                 var results = new List<BookSearchResultDto>();
@@ -55,8 +54,7 @@ namespace BookGuide.API.Controllers
                     if (string.IsNullOrWhiteSpace(bookTitle))
                         continue;
 
-                    string? author = "Unknown author";
-
+                    string author = "Unknown author";
                     if (item.TryGetProperty("author_name", out var authorProp) &&
                         authorProp.ValueKind == JsonValueKind.Array &&
                         authorProp.GetArrayLength() > 0)
@@ -65,7 +63,6 @@ namespace BookGuide.API.Controllers
                     }
 
                     string? coverUrl = null;
-
                     if (item.TryGetProperty("cover_i", out var coverProp) &&
                         coverProp.ValueKind == JsonValueKind.Number)
                     {
@@ -88,7 +85,6 @@ namespace BookGuide.API.Controllers
             {
                 Console.WriteLine("BOOK SEARCH ERROR:");
                 Console.WriteLine(ex.ToString());
-
                 return StatusCode(500, ex.ToString());
             }
         }
