@@ -15,35 +15,41 @@ export class BooksService {
 
   constructor(private http: HttpClient) {}
 
-  search(title: string): Observable<ExternalBook[]> {
-    const params = new HttpParams().set('title', title.trim());
+search(title: string): Observable<ExternalBook[]> {
+  const cleanTitle = title.trim();
+  const params = new HttpParams().set('title', cleanTitle);
 
-    return this.http.get<any>(`${this.apiBase}/api/Books/search`, { params }).pipe(
-      map((res: any) => {
-        const arr: any[] = Array.isArray(res) ? res : [];
+  console.log('SEARCH URL:', `${this.apiBase}/api/Books/search`);
+  console.log('SEARCH TITLE:', cleanTitle);
 
-        return arr.map((x: any) => ({
-          externalBookId:
-            x.externalBookId ??
-            x.ExternalBookId ??
-            '',
+  return this.http.get<any>(`${this.apiBase}/api/Books/search`, { params }).pipe(
+    map((res: any) => {
+      console.log('RAW SEARCH RESPONSE:', res);
 
-          title:
-            x.title ??
-            x.Title ??
-            'Untitled',
+      const arr: any[] = Array.isArray(res) ? res : [];
 
-          author:
-            x.author ??
-            x.Author ??
-            'Unknown author',
+      return arr.map((x: any) => ({
+        externalBookId:
+          x.externalBookId ??
+          x.ExternalBookId ??
+          '',
 
-          coverUrl:
-            x.coverUrl ??
-            x.CoverUrl ??
-            null
-        }));
-      })
-    );
-  }
+        title:
+          x.title ??
+          x.Title ??
+          'Untitled',
+
+        author:
+          x.author ??
+          x.Author ??
+          'Unknown author',
+
+        coverUrl:
+          x.coverUrl ??
+          x.CoverUrl ??
+          null
+      }));
+    })
+  );
+}
 }
