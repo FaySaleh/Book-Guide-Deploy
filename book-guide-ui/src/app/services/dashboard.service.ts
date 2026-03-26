@@ -29,8 +29,7 @@ export interface Achievement {
 
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
-
-  private api = 'https://localhost:7250/api/dashboard';
+  private api = 'https://bookguide-api.onrender.com/api/dashboard';
 
   constructor(private http: HttpClient) {}
 
