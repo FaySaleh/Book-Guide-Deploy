@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Database
 builder.Services.AddDbContext<BookGuideDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Services
 builder.Services.AddScoped<DashboardService>();
@@ -50,5 +50,21 @@ app.UseCors("AllowFrontend");
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<BookGuideDbContext>();
+
+    try
+    {
+        await db.Database.EnsureCreatedAsync();
+        Console.WriteLine("Database ensured successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Database error: " + ex.Message);
+        Console.WriteLine(ex.ToString());
+    }
+}
 
 app.Run();
