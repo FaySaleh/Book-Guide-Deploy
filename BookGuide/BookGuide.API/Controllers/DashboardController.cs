@@ -17,8 +17,17 @@ namespace BookGuide.API.Controllers
         [HttpGet("{userId}")]
         public async Task<IActionResult> Get(int userId)
         {
-            var dto = await _dashboard.GetAsync(userId);
-            return Ok(dto);
+            try
+            {
+                var dto = await _dashboard.GetAsync(userId);
+                return Ok(dto);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("DASHBOARD ERROR:");
+                Console.WriteLine(ex.ToString());
+                return StatusCode(500, ex.ToString());
+            }
         }
     }
 }
