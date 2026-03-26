@@ -151,33 +151,35 @@ error: (err) => {
     this.cdr.detectChanges();
   }
 
-  addToMyLibrary(b: ExternalBook) {
-    const user = this.auth.currentUser;
-    if (!user) {
-      alert('You must login first');
-      return;
-    }
-
-    this.userBooksApi
-      .add({
-        userId: user.id,
-        externalBookId: b.externalBookId,
-        title: b.title ?? '',
-        author: b.author ?? null,
-        coverUrl: b.coverUrl ?? null,
-        status: 1,
-        rating: null
-      })
-      .subscribe({
-        next: () => {
-          this.loadMyLibrary();
-          alert('Added to your library');
-        },
-        error: (err) => {
-          alert((typeof err?.error === 'string' ? err.error : '') || 'Failed to add book');
-        }
-      });
+addToMyLibrary(b: ExternalBook) {
+  const user = this.auth.currentUser;
+  if (!user) {
+    alert('You must login first');
+    return;
   }
+
+  this.userBooksApi
+    .add({
+      userId: user.id,
+      externalBookId: b.externalBookId,
+      title: b.title ?? '',
+      author: b.author ?? null,
+      coverUrl: b.coverUrl ?? null,
+      status: 1,
+      rating: null
+    })
+    .subscribe({
+      next: (res) => {
+        console.log('ADD BOOK SUCCESS:', res);
+        this.loadMyLibrary();
+        alert('Added to your library');
+      },
+      error: (err) => {
+        console.error('ADD BOOK ERROR:', err);
+        alert((typeof err?.error === 'string' ? err.error : '') || 'Failed to add book');
+      }
+    });
+}
 
   deleteFromMyLibrary(b: UserBook) {
     const id = (b as any).id;
