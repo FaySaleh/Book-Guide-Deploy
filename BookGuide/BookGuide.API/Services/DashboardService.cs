@@ -1,5 +1,4 @@
 ﻿using BookGuide.API.Data;
-using BookGuide.API.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookGuide.API.Services
@@ -13,25 +12,18 @@ namespace BookGuide.API.Services
             _db = db;
         }
 
-        public async Task<object> GetAsync(int userId)
+        public async Task<object> GetDashboardAsync(int userId)
         {
-            var books = await _db.UserBooks
+            var userBooks = await _db.UserBooks
                 .Where(x => x.UserId == userId)
                 .ToListAsync();
 
-            var totalBooks = books.Count;
+            var totalBooks = userBooks.Count;
+            var toRead = userBooks.Count(x => x.Status == 0);
+            var reading = userBooks.Count(x => x.Status == 1);
+            var finished = userBooks.Count(x => x.Status == 2);
 
-            var toRead = books.Count(x => x.Status == (int)ReadingStatus.ToRead);
-            var reading = books.Count(x => x.Status == (int)ReadingStatus.Reading);
-            var finished = books.Count(x => x.Status == (int)ReadingStatus.Finished);
-
-            var totalPagesRead = books.Sum(x => x.CurrentPage ?? 0);
-
-            var totalReadingDays = books
-                .Where(x => x.StartedAt != null)
-                .Count();
-
-            var currentStreakDays = 0;
+            var totalPagesRead = userBooks.Sum(x => x.CurrentPage ?? 0);
 
             return new
             {
@@ -42,8 +34,8 @@ namespace BookGuide.API.Services
                     reading,
                     finished,
                     totalPagesRead,
-                    totalReadingDays,
-                    currentStreakDays
+                    totalReadingDays = 0,
+                    currentStreakDays = 0
                 },
                 achievements = new List<object>()
             };

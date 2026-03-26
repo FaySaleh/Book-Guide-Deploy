@@ -7,26 +7,28 @@ namespace BookGuide.API.Controllers
     [Route("api/[controller]")]
     public class DashboardController : ControllerBase
     {
-        private readonly DashboardService _dashboard;
+        private readonly DashboardService _dashboardService;
 
-        public DashboardController(DashboardService dashboard)
+        public DashboardController(DashboardService dashboardService)
         {
-            _dashboard = dashboard;
+            _dashboardService = dashboardService;
         }
 
         [HttpGet("{userId}")]
-        public async Task<IActionResult> Get(int userId)
+        public async Task<IActionResult> GetDashboard(int userId)
         {
             try
             {
-                var dto = await _dashboard.GetAsync(userId);
-                return Ok(dto);
+                var result = await _dashboardService.GetDashboardAsync(userId);
+                return Ok(result);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("DASHBOARD ERROR:");
-                Console.WriteLine(ex.ToString());
-                return StatusCode(500, ex.ToString());
+                return StatusCode(500, new
+                {
+                    message = "An error occurred while loading dashboard data.",
+                    error = ex.Message
+                });
             }
         }
     }

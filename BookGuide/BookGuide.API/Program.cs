@@ -1,12 +1,16 @@
 ﻿using BookGuide.API.Data;
+using BookGuide.API.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddHttpClient();
-
+// Database
 builder.Services.AddDbContext<BookGuideDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Services
+builder.Services.AddScoped<DashboardService>();
+builder.Services.AddScoped<NotificationsService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -18,8 +22,8 @@ builder.Services.AddCors(options =>
     {
         policy
             .WithOrigins(
-                "https://bookguide-ui.onrender.com",
-                "http://localhost:4200"
+                "http://localhost:4200",
+                "https://bookguide-ui.onrender.com"
             )
             .AllowAnyHeader()
             .AllowAnyMethod();
@@ -28,12 +32,21 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+else
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
-app.MapGet("/", () => Results.Redirect("/swagger"));
+app.UseHttpsRedirection();
 
 app.UseCors("AllowFrontend");
+
 app.UseAuthorization();
 
 app.MapControllers();
