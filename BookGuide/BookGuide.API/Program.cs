@@ -32,7 +32,9 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// Middleware
+// Root redirect to swagger
+app.MapGet("/", () => Results.Redirect("/swagger"));
+
 app.UseCors("AllowFrontend");
 
 app.UseHttpsRedirection();
