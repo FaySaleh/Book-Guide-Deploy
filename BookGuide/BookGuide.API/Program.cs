@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddHttpClient();
 
 builder.Services.AddDbContext<BookGuideDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -28,16 +28,12 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Swagger
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// Root redirect to swagger
 app.MapGet("/", () => Results.Redirect("/swagger"));
 
 app.UseCors("AllowFrontend");
-
-app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
