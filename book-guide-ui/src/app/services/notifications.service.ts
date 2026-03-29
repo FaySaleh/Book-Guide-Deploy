@@ -22,8 +22,7 @@ export interface PagedNotifications {
 
 @Injectable({ providedIn: 'root' })
 export class NotificationsService {
-  private baseUrl = '/api/Notifications';
-
+private baseUrl = 'https://bookguide-api.onrender.com/api/Notifications';
   private unreadSubject = new BehaviorSubject<number>(0);
   unreadCount$ = this.unreadSubject.asObservable();
 
