@@ -1,102 +1,68 @@
-﻿using BookGuide.API.Data;
-using BookGuide.API.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace BookGuide.API.Services
 {
     public class ReminderHostedService : BackgroundService
     {
         private readonly IServiceScopeFactory _scopeFactory;
+        private readonly ILogger<ReminderHostedService> _logger;
 
-        public ReminderHostedService(IServiceScopeFactory scopeFactory)
+        public ReminderHostedService(
+            IServiceScopeFactory scopeFactory,
+            ILogger<ReminderHostedService> logger)
         {
             _scopeFactory = scopeFactory;
+            _logger = logger;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+            _logger.LogInformation("ReminderHostedService started.");
 
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
-                    Console.WriteLine($"[REMINDER] Running job at UTC: {DateTime.UtcNow:O}");
-                    await Run(stoppingToken);
+                    using var scope = _scopeFactory.CreateScope();
+                    var notificationsService = scope.ServiceProvider.GetRequiredService<NotificationsService>();
+
+                    _logger.LogInformation("Running reading reminders at: {time}", DateTime.UtcNow);
+
+                    var result = await notificationsService.RunReadingRemindersAsync(2, stoppingToken);
+
+                    _logger.LogInformation(
+                        "Reading reminders completed. Matched={matched}, Created={created}",
+                        result.Matched,
+                        result.Created);
+                }
+                catch (OperationCanceledException)
+                {
+                    _logger.LogInformation("ReminderHostedService is stopping.");
+                    break;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("REMINDER JOB ERROR: " + ex);
+                    _logger.LogError(ex, "Error while running ReminderHostedService.");
                 }
 
-                var saudiOffset = TimeSpan.FromHours(3);
-
-                var nowUtc = DateTimeOffset.UtcNow;
-                var nowSaudi = nowUtc.ToOffset(saudiOffset);
-
-                var nextRunSaudi = new DateTimeOffset(
-                    nowSaudi.Year,
-                    nowSaudi.Month,
-                    nowSaudi.Day,
-                    10, 0, 0,
-                    saudiOffset);
-
-                if (nowSaudi >= nextRunSaudi)
+                try
                 {
-                    nextRunSaudi = nextRunSaudi.AddDays(1);
+                    // للتجربة: كل دقيقة
+                    await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+
+                    // بعد ما تتأكدين أنه شغال غيّريها للمدة المناسبة
+                    // await Task.Delay(TimeSpan.FromHours(24), stoppingToken);
                 }
-
-                var nextRunUtc = nextRunSaudi.ToUniversalTime();
-
-                var delay = nextRunUtc - nowUtc;
-
-
-                Console.WriteLine($"[REMINDER] Next run (Saudi): {nextRunSaudi:yyyy-MM-dd HH:mm} | delay: {delay}");
-
-                await Task.Delay(delay, stoppingToken);
+                catch (OperationCanceledException)
+                {
+                    _logger.LogInformation("ReminderHostedService delay cancelled.");
+                    break;
+                }
             }
-        }
 
-        private async Task Run(CancellationToken ct)
-        {
-            using var scope = _scopeFactory.CreateScope();
-
-            var db = scope.ServiceProvider.GetRequiredService<BookGuideDbContext>();
-            var notifications = scope.ServiceProvider.GetRequiredService<NotificationsService>();
-
-            const int days = 1;
-            var threshold = DateTime.UtcNow.AddDays(-days);
-
-            var cooldown = TimeSpan.FromDays(1);
-            var since = DateTime.UtcNow - cooldown;
-
-            var books = await db.UserBooks
-                .Where(ub =>
-                    ub.Status == (int)ReadingStatus.Reading &&
-                    ub.StartedAt != null &&
-                    (ub.LastReadAt ?? ub.LastProgressAt ?? ub.StartedAt) < threshold
-                )
-                .Select(ub => new { ub.Id, ub.UserId, ub.Title })
-                .ToListAsync(ct);
-
-            foreach (var ub in books)
-            {
-                var alreadySent = await db.Notifications.AnyAsync(n =>
-                    n.UserId == ub.UserId &&
-                    n.UserBookId == ub.Id &&
-                    n.Type == "ReadingReminder" &&
-                    n.CreatedAt >= since,
-                    ct);
-
-                if (alreadySent) continue;
-
-                await notifications.CreateAsync(
-                    userId: ub.UserId,
-                    title: "Reading Reminder",
-                    message: $"it's been {days} day(s) since you last read \"{ub.Title}\"",
-                    userBookId: ub.Id
-                );
-            }
+            _logger.LogInformation("ReminderHostedService stopped.");
         }
     }
 }

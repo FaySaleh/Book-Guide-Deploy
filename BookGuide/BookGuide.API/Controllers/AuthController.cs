@@ -25,6 +25,8 @@ namespace BookGuide.API.Controllers
             _config = config;
         }
 
+
+
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequest dto)
         {
@@ -78,28 +80,44 @@ namespace BookGuide.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.Email) ||
+            try
+            {
+                if (string.IsNullOrWhiteSpace(request.Email) ||
                 string.IsNullOrWhiteSpace(request.Password))
-            {
-                return BadRequest("Email and Password are required.");
+                {
+                    return BadRequest("Email and Password are required.");
+                }
+
+                var email = request.Email.Trim().ToLower();
+
+                var user = await _db.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email);
+                if (user == null)
+                    return Unauthorized("Invalid email or password.");
+
+                if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+                    return Unauthorized("Invalid email or password.");
+
+                return Ok(new
+                {
+                    user.Id,
+                    user.FullName,
+                    user.Email
+                });
             }
-
-            var email = request.Email.Trim().ToLower();
-
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email);
-            if (user == null)
-                return Unauthorized("Invalid email or password.");
-
-            if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-                return Unauthorized("Invalid email or password.");
-
-            return Ok(new
+            catch (Exception ex)
             {
-                user.Id,
-                user.FullName,
-                user.Email
-            });
+                Console.WriteLine("LOGIN ERROR:");
+                Console.WriteLine(ex.ToString());
+
+                return StatusCode(500, new
+                {
+                    message = "Login failed",
+                    error = ex.Message
+                });
+            }
         }
+        
+
 
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest dto)

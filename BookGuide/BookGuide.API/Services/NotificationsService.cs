@@ -8,17 +8,26 @@ namespace BookGuide.API.Services
     {
         private readonly BookGuideDbContext _db;
         private readonly IEmailSender _email;
+        private readonly ILogger<NotificationsService> _logger;
 
-        public NotificationsService(BookGuideDbContext db, IEmailSender email)
+        public NotificationsService(
+            BookGuideDbContext db,
+            IEmailSender email,
+            ILogger<NotificationsService> logger)
         {
             _db = db;
             _email = email;
+            _logger = logger;
         }
 
         public async Task CreateAsync(int userId, string title, string message, int? userBookId)
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            if (user == null) return;
+            if (user == null)
+            {
+                _logger.LogWarning("CreateAsync skipped: user not found. UserId={userId}", userId);
+                return;
+            }
 
             var notification = new Notification
             {
@@ -34,16 +43,33 @@ namespace BookGuide.API.Services
             _db.Notifications.Add(notification);
             await _db.SaveChangesAsync();
 
+            _logger.LogInformation(
+                "Notification created for UserId={userId}, UserBookId={userBookId}",
+                userId,
+                userBookId);
+
             if (!string.IsNullOrWhiteSpace(user.Email))
             {
                 try
                 {
                     await _email.SendAsync(user.Email, title, message);
+                    _logger.LogInformation(
+                        "Reminder email sent successfully to {email} for UserId={userId}",
+                        user.Email,
+                        userId);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("EMAIL ERROR (CreateAsync): " + ex);
+                    _logger.LogError(
+                        ex,
+                        "EMAIL ERROR (CreateAsync) for UserId={userId}, Email={email}",
+                        userId,
+                        user.Email);
                 }
+            }
+            else
+            {
+                _logger.LogWarning("User has no email. UserId={userId}", userId);
             }
         }
 
@@ -51,6 +77,8 @@ namespace BookGuide.API.Services
             int days = 2,
             CancellationToken ct = default)
         {
+            _logger.LogInformation("RunReadingRemindersAsync started. Days={days}", days);
+
             if (days < 1) days = 1;
             if (days > 30) days = 30;
 
@@ -74,28 +102,59 @@ namespace BookGuide.API.Services
                 })
                 .ToListAsync(ct);
 
+            _logger.LogInformation("Candidates found: {count}", candidates.Count);
+
             var created = 0;
 
             foreach (var ub in candidates)
             {
-                var alreadySent = await _db.Notifications.AnyAsync(n =>
-                    n.UserId == ub.UserId &&
-                    n.UserBookId == ub.Id &&
-                    n.Type == "ReadingReminder" &&
-                    n.CreatedAt >= since,
-                    ct);
+                try
+                {
+                    var alreadySent = await _db.Notifications.AnyAsync(n =>
+                        n.UserId == ub.UserId &&
+                        n.UserBookId == ub.Id &&
+                        n.Type == "ReadingReminder" &&
+                        n.CreatedAt >= since,
+                        ct);
 
-                if (alreadySent) continue;
+                    if (alreadySent)
+                    {
+                        _logger.LogInformation(
+                            "Skipped duplicate reminder for UserId={userId}, UserBookId={userBookId}",
+                            ub.UserId,
+                            ub.Id);
 
-                await CreateAsync(
-                    userId: ub.UserId,
-                    title: "Reading Reminder",
-                    message: $"it's been {days} day(s) since you last read \"{ub.Title}\"",
-                    userBookId: ub.Id
-                );
+                        continue;
+                    }
 
-                created++;
+                    await CreateAsync(
+                        userId: ub.UserId,
+                        title: "Reading Reminder",
+                        message: $"It's been {days} day(s) since you last read \"{ub.Title}\".",
+                        userBookId: ub.Id
+                    );
+
+                    created++;
+
+                    _logger.LogInformation(
+                        "Reminder created for UserId={userId}, UserBookId={userBookId}",
+                        ub.UserId,
+                        ub.Id);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(
+                        ex,
+                        "Error while processing reminder for UserId={userId}, UserBookId={userBookId}",
+                        ub.UserId,
+                        ub.Id);
+                }
             }
+
+            _logger.LogInformation(
+                "RunReadingRemindersAsync finished. Matched={matched}, Created={created}",
+                candidates.Count,
+                created);
 
             return new RunRemindersResult
             {

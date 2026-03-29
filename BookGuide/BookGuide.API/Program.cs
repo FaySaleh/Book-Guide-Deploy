@@ -15,6 +15,8 @@ builder.Services.AddScoped<DashboardService>();
 builder.Services.AddScoped<NotificationsService>();
 builder.Services.AddScoped<AchievementsService>();
 builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
+builder.Services.AddHostedService<ReminderHostedService>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
