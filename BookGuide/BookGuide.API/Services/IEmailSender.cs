@@ -27,12 +27,11 @@ namespace BookGuide.API.Services
             var smtpUser = _config["Email:Username"];
             var smtpPass = _config["Email:Password"];
 
-            _logger.LogInformation("EMAIL DEBUG: preparing email send");
-            _logger.LogInformation("EMAIL DEBUG: Host = {Host}", smtpHost);
-            _logger.LogInformation("EMAIL DEBUG: Port = {Port}", smtpPortValue);
-            _logger.LogInformation("EMAIL DEBUG: Username = {Username}", smtpUser);
-            _logger.LogInformation("EMAIL DEBUG: From = {From}", fromEmail);
-            _logger.LogInformation("EMAIL DEBUG: To = {To}", toEmail);
+            _logger.LogInformation("EMAIL DEBUG: Host={Host}", smtpHost);
+            _logger.LogInformation("EMAIL DEBUG: Port={Port}", smtpPortValue);
+            _logger.LogInformation("EMAIL DEBUG: Username={Username}", smtpUser);
+            _logger.LogInformation("EMAIL DEBUG: From={From}", fromEmail);
+            _logger.LogInformation("EMAIL DEBUG: To={To}", toEmail);
 
             if (string.IsNullOrWhiteSpace(fromEmail))
                 throw new Exception("Email:From is missing.");
@@ -56,21 +55,23 @@ namespace BookGuide.API.Services
             message.Body = body;
             message.IsBodyHtml = true;
 
-            using var smtp = new SmtpClient(smtpHost, smtpPort);
-            smtp.EnableSsl = true;
-            smtp.UseDefaultCredentials = false;
-            smtp.Credentials = new NetworkCredential(smtpUser, smtpPass);
-            smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
-            smtp.Timeout = 30000;
+            using var smtp = new SmtpClient(smtpHost, smtpPort)
+            {
+                EnableSsl = true,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(smtpUser, smtpPass),
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                Timeout = 30000
+            };
 
             try
             {
                 await smtp.SendMailAsync(message);
-                _logger.LogInformation("EMAIL DEBUG: email sent successfully to {To}", toEmail);
+                _logger.LogInformation("EMAIL DEBUG: Email sent successfully to {To}", toEmail);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "EMAIL ERROR: failed to send email to {To}", toEmail);
+                _logger.LogError(ex, "EMAIL ERROR: Failed to send email to {To}", toEmail);
                 throw;
             }
         }
