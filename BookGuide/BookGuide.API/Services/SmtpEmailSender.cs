@@ -49,7 +49,7 @@ namespace BookGuide.API.Services
                 From = new MailAddress(from, "BookGuide"),
                 Subject = subject,
                 Body = body,
-                IsBodyHtml = true   // 🔥🔥 هذا هو الحل
+                IsBodyHtml = true   
             };
 
             mail.To.Add(toEmail);

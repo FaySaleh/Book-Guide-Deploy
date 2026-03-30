@@ -1,6 +1,4 @@
-﻿using BookGuide.API.Services;
-
-using System.Net;
+﻿using System.Net;
 using System.Net.Mail;
 
 namespace BookGuide.API.Services
@@ -9,36 +7,72 @@ namespace BookGuide.API.Services
     {
         Task SendAsync(string toEmail, string subject, string body);
     }
+
     public class EmailSender : IEmailSender
     {
         private readonly IConfiguration _config;
+        private readonly ILogger<EmailSender> _logger;
 
-        public EmailSender(IConfiguration config)
+        public EmailSender(IConfiguration config, ILogger<EmailSender> logger)
         {
             _config = config;
+            _logger = logger;
         }
 
         public async Task SendAsync(string toEmail, string subject, string body)
         {
             var fromEmail = _config["Email:From"];
             var smtpHost = _config["Email:Host"];
-            var smtpPort = int.Parse(_config["Email:Port"] ?? "587");
+            var smtpPortValue = _config["Email:Port"];
             var smtpUser = _config["Email:Username"];
             var smtpPass = _config["Email:Password"];
 
+            _logger.LogInformation("EMAIL DEBUG: preparing email send");
+            _logger.LogInformation("EMAIL DEBUG: Host = {Host}", smtpHost);
+            _logger.LogInformation("EMAIL DEBUG: Port = {Port}", smtpPortValue);
+            _logger.LogInformation("EMAIL DEBUG: Username = {Username}", smtpUser);
+            _logger.LogInformation("EMAIL DEBUG: From = {From}", fromEmail);
+            _logger.LogInformation("EMAIL DEBUG: To = {To}", toEmail);
+
+            if (string.IsNullOrWhiteSpace(fromEmail))
+                throw new Exception("Email:From is missing.");
+
+            if (string.IsNullOrWhiteSpace(smtpHost))
+                throw new Exception("Email:Host is missing.");
+
+            if (string.IsNullOrWhiteSpace(smtpUser))
+                throw new Exception("Email:Username is missing.");
+
+            if (string.IsNullOrWhiteSpace(smtpPass))
+                throw new Exception("Email:Password is missing.");
+
+            if (!int.TryParse(smtpPortValue, out var smtpPort))
+                smtpPort = 587;
+
             using var message = new MailMessage();
-            message.From = new MailAddress(smtpUser!, "Book Guide");
+            message.From = new MailAddress(fromEmail, "Book Guide");
             message.To.Add(toEmail);
             message.Subject = subject;
             message.Body = body;
             message.IsBodyHtml = true;
 
-            using var smtp = new SmtpClient(smtpHost!, smtpPort);
+            using var smtp = new SmtpClient(smtpHost, smtpPort);
             smtp.EnableSsl = true;
+            smtp.UseDefaultCredentials = false;
             smtp.Credentials = new NetworkCredential(smtpUser, smtpPass);
+            smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+            smtp.Timeout = 30000;
 
-            await smtp.SendMailAsync(message);
+            try
+            {
+                await smtp.SendMailAsync(message);
+                _logger.LogInformation("EMAIL DEBUG: email sent successfully to {To}", toEmail);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "EMAIL ERROR: failed to send email to {To}", toEmail);
+                throw;
+            }
         }
-
     }
 }

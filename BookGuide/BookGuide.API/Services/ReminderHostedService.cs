@@ -49,11 +49,8 @@ namespace BookGuide.API.Services
 
                 try
                 {
-                    // للتجربة: كل دقيقة
-                    await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+                    await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
 
-                    // بعد ما تتأكدين أنه شغال غيّريها للمدة المناسبة
-                    // await Task.Delay(TimeSpan.FromHours(24), stoppingToken);
                 }
                 catch (OperationCanceledException)
                 {
