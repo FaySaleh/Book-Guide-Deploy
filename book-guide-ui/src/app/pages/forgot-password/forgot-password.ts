@@ -24,36 +24,34 @@ export class ForgotPasswordComponent {
     private cdr: ChangeDetectorRef
   ) {}
 
-  submit() {
-    this.error = '';
-    this.message = '';
+submit() {
+  this.error = '';
+  this.message = '';
 
-    const email = this.email.trim();
-    if (!email) {
-      this.error = 'Please enter your email.';
-      return;
-    }
-
-    this.loading = true;
-
-    this.auth.forgotPassword(email)
-      .pipe(
-        finalize(() => {
-          this.loading = false;
-
-          // ✅ مهم: يجبر الواجهة تتحدث حتى لو عندك مشكلة change detection
-          this.cdr.detectChanges();
-        })
-      )
-      .subscribe({
-        next: (res: any) => {
-          this.message = res?.message ?? 'If the email exists, a reset link will be sent.';
-        },
-        error: (err: any) => {
-          this.message = 'If the email exists, a reset link will be sent.';
-
-          console.error('Forgot password error:', err);
-        }
-      });
+  const email = this.email.trim();
+  if (!email) {
+    this.error = 'Please enter your email.';
+    return;
   }
+
+  this.loading = true;
+
+  this.auth.forgotPassword(email)
+    .pipe(
+      finalize(() => {
+        this.loading = false;
+        this.cdr.detectChanges();
+      })
+    )
+    .subscribe({
+      next: (res: any) => {
+        this.message = res?.message ?? 'If the email exists, a reset link will be sent.';
+      },
+      error: (err: any) => {
+        this.error = err?.error?.message ?? 'Failed to send reset link.';
+        console.error('Forgot password error:', err);
+      }
+    });
 }
+  }
+
