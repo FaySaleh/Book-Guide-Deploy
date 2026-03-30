@@ -120,15 +120,15 @@ namespace BookGuide.API.Controllers
 
 
         [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest dto)
+        public async Task<IActionResult> ForgotPasswordDev(ForgotPasswordRequest dto)
         {
             var email = dto.Email?.Trim().ToLower();
             if (string.IsNullOrWhiteSpace(email))
-                return Ok(new { message = "If the email exists, a reset link will be sent." });
+                return BadRequest(new { message = "Email is required." });
 
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email);
             if (user == null)
-                return Ok(new { message = "If the email exists, a reset link will be sent." });
+                return NotFound(new { message = "User not found." });
 
             var token = Guid.NewGuid().ToString("N");
             var tokenHash = Sha256(token);
@@ -146,39 +146,14 @@ namespace BookGuide.API.Controllers
             await _db.SaveChangesAsync();
 
             var frontendBaseUrl = _config["App:FrontendBaseUrl"]?.Trim().TrimEnd('/');
-            if (string.IsNullOrWhiteSpace(frontendBaseUrl))
-                return StatusCode(500, new { message = "FrontendBaseUrl is not configured." });
-
             var resetUrl = $"{frontendBaseUrl}/reset-password?token={token}";
 
-            var html = EmailTemplates.ResetPasswordHtml(
-                "BookGuide",
-                "https://i.ibb.co/TMzSkvpW/Logo.png",
-                user.FullName,
+            return Ok(new
+            {
+                message = "Reset token created successfully.",
+                token,
                 resetUrl
-            );
-
-            try
-            {
-                await _email.SendAsync(
-                    user.Email,
-                    "Reset your BookGuide password",
-                    html
-                );
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("FORGOT PASSWORD EMAIL ERROR:");
-                Console.WriteLine(ex.ToString());
-
-                return StatusCode(500, new
-                {
-                    message = "Failed to send reset email.",
-                    error = ex.Message
-                });
-            }
-
-            return Ok(new { message = "If the email exists, a reset link will be sent." });
+            });
         }
 
         [HttpPost("reset-password")]
