@@ -120,6 +120,73 @@ namespace BookGuide.API.Controllers
 
 
         [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest dto)
+        {
+            var email = dto.Email?.Trim().ToLower();
+            if (string.IsNullOrWhiteSpace(email))
+                return Ok(new { message = "If the email exists, a reset link will be sent." });
+
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email);
+            if (user == null)
+                return Ok(new { message = "If the email exists, a reset link will be sent." });
+
+            var token = Guid.NewGuid().ToString("N");
+            var tokenHash = Sha256(token);
+
+            var resetToken = new PasswordResetToken
+            {
+                UserId = user.Id,
+                TokenHash = tokenHash,
+                CreatedAt = DateTime.UtcNow,
+                ExpiryAt = DateTime.UtcNow.AddHours(1),
+                IsUsed = false
+            };
+
+            _db.PasswordResetTokens.Add(resetToken);
+            await _db.SaveChangesAsync();
+
+            var frontendBaseUrl = _config["App:FrontendBaseUrl"]?.Trim().TrimEnd('/');
+            if (string.IsNullOrWhiteSpace(frontendBaseUrl))
+            {
+                return StatusCode(500, new
+                {
+                    message = "FrontendBaseUrl is not configured."
+                });
+            }
+
+            var resetUrl = $"{frontendBaseUrl}/reset-password?token={token}";
+
+            var html = EmailTemplates.ResetPasswordHtml(
+                "BookGuide",
+                "https://i.ibb.co/TMzSkvpW/Logo.png",
+                user.FullName,
+                resetUrl
+            );
+
+            try
+            {
+                await _email.SendAsync(
+                    user.Email,
+                    "Reset your BookGuide password",
+                    html
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("FORGOT PASSWORD EMAIL ERROR:");
+                Console.WriteLine(ex.ToString());
+
+                return StatusCode(500, new
+                {
+                    message = "Failed to send reset email.",
+                    error = ex.Message
+                });
+            }
+
+            return Ok(new { message = "If the email exists, a reset link will be sent." });
+        }
+
+        [HttpPost("forgot-password-dev")]
         public async Task<IActionResult> ForgotPasswordDev(ForgotPasswordRequest dto)
         {
             var email = dto.Email?.Trim().ToLower();
@@ -146,6 +213,14 @@ namespace BookGuide.API.Controllers
             await _db.SaveChangesAsync();
 
             var frontendBaseUrl = _config["App:FrontendBaseUrl"]?.Trim().TrimEnd('/');
+            if (string.IsNullOrWhiteSpace(frontendBaseUrl))
+            {
+                return StatusCode(500, new
+                {
+                    message = "FrontendBaseUrl is not configured."
+                });
+            }
+
             var resetUrl = $"{frontendBaseUrl}/reset-password?token={token}";
 
             return Ok(new
@@ -159,10 +234,12 @@ namespace BookGuide.API.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest req)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var token = req.Token.Trim();
-            if (token.Length < 20) return BadRequest("Invalid token.");
+            if (token.Length < 20)
+                return BadRequest("Invalid token.");
 
             var tokenHash = Sha256(token);
             var now = DateTime.UtcNow;
@@ -178,7 +255,6 @@ namespace BookGuide.API.Controllers
                 return BadRequest("Token is invalid or expired.");
 
             record.User.PasswordHash = BCrypt.Net.BCrypt.HashPassword(req.NewPassword);
-
             record.IsUsed = true;
             record.UsedAt = now;
 
