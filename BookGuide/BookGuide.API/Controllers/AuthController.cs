@@ -173,7 +173,7 @@ namespace BookGuide.API.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine("FORGOT PASSWORD EMAIL ERROR:");
+                Console.WriteLine("EMAIL ERROR:");
                 Console.WriteLine(ex.ToString());
 
                 return StatusCode(500, new
