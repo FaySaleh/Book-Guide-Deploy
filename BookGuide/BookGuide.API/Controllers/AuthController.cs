@@ -116,7 +116,7 @@ namespace BookGuide.API.Controllers
                 });
             }
         }
-        
+
 
 
         [HttpPost("forgot-password")]
@@ -124,11 +124,11 @@ namespace BookGuide.API.Controllers
         {
             var email = dto.Email?.Trim().ToLower();
             if (string.IsNullOrWhiteSpace(email))
-                return Ok();
+                return Ok(new { message = "If the email exists, a reset link will be sent." });
 
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email);
             if (user == null)
-                return Ok();
+                return Ok(new { message = "If the email exists, a reset link will be sent." });
 
             var token = Guid.NewGuid().ToString("N");
             var tokenHash = Sha256(token);
@@ -137,6 +137,7 @@ namespace BookGuide.API.Controllers
             {
                 UserId = user.Id,
                 TokenHash = tokenHash,
+                CreatedAt = DateTime.UtcNow,
                 ExpiryAt = DateTime.UtcNow.AddHours(1),
                 IsUsed = false
             };
@@ -144,7 +145,11 @@ namespace BookGuide.API.Controllers
             _db.PasswordResetTokens.Add(resetToken);
             await _db.SaveChangesAsync();
 
-            var resetUrl = $"http://localhost:4200/reset-password?token={token}";
+            var frontendBaseUrl = _config["App:FrontendBaseUrl"]?.Trim().TrimEnd('/');
+            if (string.IsNullOrWhiteSpace(frontendBaseUrl))
+                return StatusCode(500, new { message = "FrontendBaseUrl is not configured." });
+
+            var resetUrl = $"{frontendBaseUrl}/reset-password?token={token}";
 
             var html = EmailTemplates.ResetPasswordHtml(
                 "BookGuide",
@@ -153,13 +158,27 @@ namespace BookGuide.API.Controllers
                 resetUrl
             );
 
-            await _email.SendAsync(
-                user.Email,
-                "Reset your BookGuide password",
-                html
-            );
+            try
+            {
+                await _email.SendAsync(
+                    user.Email,
+                    "Reset your BookGuide password",
+                    html
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("FORGOT PASSWORD EMAIL ERROR:");
+                Console.WriteLine(ex.ToString());
 
-            return Ok();
+                return StatusCode(500, new
+                {
+                    message = "Failed to send reset email.",
+                    error = ex.Message
+                });
+            }
+
+            return Ok(new { message = "If the email exists, a reset link will be sent." });
         }
 
         [HttpPost("reset-password")]
