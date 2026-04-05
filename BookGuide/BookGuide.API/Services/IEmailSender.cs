@@ -1,11 +1,12 @@
-﻿using System.Net;
+﻿/*
+using System.Net;
 using System.Net.Mail;
 
 namespace BookGuide.API.Services
 {
     public interface IEmailSender
     {
-        Task SendAsync(string toEmail, string subject, string body);
+        Task SendAsync(string toEmail, string subject, string html);
     }
 
     public class EmailSender : IEmailSender
@@ -75,5 +76,12 @@ namespace BookGuide.API.Services
                 throw;
             }
         }
+    }
+}*/
+namespace BookGuide.API.Services
+{
+    public interface IEmailSender
+    {
+        Task SendAsync(string toEmail, string subject, string body);
     }
 }
