@@ -40,7 +40,7 @@ export interface UserBookProgress {
 
 @Injectable({ providedIn: 'root' })
 export class UserBooksService {
-private apiBase = `${environment.apiBaseUrl}/UserBooks`;
+private apiBase = environment.apiBaseUrl;
   constructor(private http: HttpClient) {}
 
   getUserBooks(userId: number): Observable<UserBook[]> {
