@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-apiBaseUrl: 'book-guide-deploy-production.up.railway.app'
+  apiBaseUrl: 'https://book-guide-deploy-production.up.railway.app/api'
 };
