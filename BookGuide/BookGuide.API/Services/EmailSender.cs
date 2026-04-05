@@ -1,6 +1,4 @@
-﻿
-/*
-using System.Net;
+﻿using System.Net;
 using System.Net.Mail;
 
 namespace BookGuide.API.Services
@@ -68,21 +66,21 @@ namespace BookGuide.API.Services
 
             try
             {
+                _logger.LogInformation("EMAIL DEBUG: Starting SMTP send...");
                 await smtp.SendMailAsync(message);
                 _logger.LogInformation("EMAIL DEBUG: Email sent successfully to {To}", toEmail);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "EMAIL ERROR: Failed to send email to {To}", toEmail);
+                _logger.LogError(ex, "EMAIL ERROR: Failed to send email to {To}. Message: {Message}", toEmail, ex.Message);
+
+                if (ex.InnerException != null)
+                {
+                    _logger.LogError("EMAIL ERROR INNER: {InnerMessage}", ex.InnerException.Message);
+                }
+
                 throw;
             }
         }
-    }
-}*/
-namespace BookGuide.API.Services
-{
-    public interface IEmailSender
-    {
-        Task SendAsync(string toEmail, string subject, string html);
     }
 }
