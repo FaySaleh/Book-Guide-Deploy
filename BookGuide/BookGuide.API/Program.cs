@@ -30,10 +30,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy
-            .WithOrigins(
-                "http://localhost:4200",
-                "https://bookguide-ui.onrender.com"
-            )
+            .WithOrigins("https://illustrious-liberation-production.up.railway.app")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
