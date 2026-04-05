@@ -12,11 +12,9 @@ export interface UserBook {
   coverUrl?: string | null;
   status: number;
   rating?: number | null;
-
   totalPages?: number | null;
   currentPage?: number | null;
   progressPercent?: number | null;
-
   startedAt?: string | null;
   finishedAt?: string | null;
   lastReadAt?: string | null;
@@ -27,11 +25,9 @@ export interface UserBookProgress {
   id?: number;
   userBookId: number;
   status?: number | null;
-
   currentPage: number | null;
   totalPages: number | null;
   progressPercent: number | null;
-
   startedAt: string | null;
   finishedAt: string | null;
   lastReadAt: string | null;
@@ -40,15 +36,16 @@ export interface UserBookProgress {
 
 @Injectable({ providedIn: 'root' })
 export class UserBooksService {
-private apiBase = environment.apiBaseUrl;
+  private apiBase = environment.apiBaseUrl;
+
   constructor(private http: HttpClient) {}
 
   getUserBooks(userId: number): Observable<UserBook[]> {
-    return this.http.get<UserBook[]>(`${this.apiBase}/api/UserBooks?userId=${userId}`);
+    return this.http.get<UserBook[]>(`${this.apiBase}/UserBooks?userId=${userId}`);
   }
 
   getById(id: number): Observable<UserBook> {
-    return this.http.get<UserBook>(`${this.apiBase}/api/UserBooks/${id}`);
+    return this.http.get<UserBook>(`${this.apiBase}/UserBooks/${id}`);
   }
 
   add(data: {
@@ -62,19 +59,19 @@ private apiBase = environment.apiBaseUrl;
     totalPages?: number | null;
     currentPage?: number | null;
   }): Observable<any> {
-    return this.http.post(`${this.apiBase}/api/UserBooks`, data);
+    return this.http.post(`${this.apiBase}/UserBooks`, data);
   }
 
   update(id: number, data: Partial<UserBook>): Observable<UserBook> {
-    return this.http.put<UserBook>(`${this.apiBase}/api/UserBooks/${id}`, data);
+    return this.http.put<UserBook>(`${this.apiBase}/UserBooks/${id}`, data);
   }
 
   delete(id: number): Observable<any> {
-    return this.http.delete(`${this.apiBase}/api/UserBooks/${id}`);
+    return this.http.delete(`${this.apiBase}/UserBooks/${id}`);
   }
 
   getProgress(id: number): Observable<UserBookProgress> {
-    return this.http.get<UserBookProgress>(`${this.apiBase}/api/UserBooks/${id}/progress`);
+    return this.http.get<UserBookProgress>(`${this.apiBase}/UserBooks/${id}/progress`);
   }
 
   updateProgress(
@@ -85,7 +82,7 @@ private apiBase = environment.apiBaseUrl;
     }
   ): Observable<UserBookProgress> {
     return this.http.put<UserBookProgress>(
-      `${this.apiBase}/api/UserBooks/${id}/progress`,
+      `${this.apiBase}/UserBooks/${id}/progress`,
       data
     );
   }
