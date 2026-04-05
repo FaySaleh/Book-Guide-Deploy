@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface NotificationDto {
   id: number;
@@ -22,7 +23,7 @@ export interface PagedNotifications {
 
 @Injectable({ providedIn: 'root' })
 export class NotificationsService {
-private baseUrl = 'https://bookguide-api.onrender.com/api/Notifications';
+private apiBase = `${environment.apiBaseUrl}/UserBooks`;
   private unreadSubject = new BehaviorSubject<number>(0);
   unreadCount$ = this.unreadSubject.asObservable();
 
@@ -35,7 +36,7 @@ private baseUrl = 'https://bookguide-api.onrender.com/api/Notifications';
   refreshUnreadCount(userId: number): Observable<{ userId: number; unread: number }> {
     const params = new HttpParams().set('userId', userId);
     return this.http
-      .get<{ userId: number; unread: number }>(`${this.baseUrl}/unread-count`, { params })
+      .get<{ userId: number; unread: number }>(`${this.apiBase}/unread-count`, { params })
       .pipe(tap(res => this.setUnreadCount(res.unread)));
   }
 
@@ -51,22 +52,22 @@ private baseUrl = 'https://bookguide-api.onrender.com/api/Notifications';
       .set('pageSize', pageSize)
       .set('onlyUnread', onlyUnread);
 
-    return this.http.get<PagedNotifications>(this.baseUrl, { params });
+    return this.http.get<PagedNotifications>(this.apiBase, { params });
   }
 
   markRead(id: number, userId: number): Observable<void> {
     const params = new HttpParams().set('userId', userId);
-    return this.http.put<void>(`${this.baseUrl}/${id}/read`, {}, { params });
+    return this.http.put<void>(`${this.apiBase}/${id}/read`, {}, { params });
   }
 
   markAllRead(userId: number): Observable<{ updated: number }> {
     const params = new HttpParams().set('userId', userId);
-    return this.http.put<{ updated: number }>(`${this.baseUrl}/mark-all-read`, {}, { params });
+    return this.http.put<{ updated: number }>(`${this.apiBase}/mark-all-read`, {}, { params });
   }
 
   runReminders(days = 3, userId?: number): Observable<any> {
     let params = new HttpParams().set('days', days);
     if (userId) params = params.set('userId', userId);
-    return this.http.post<any>(`${this.baseUrl}/run-reminders`, {}, { params });
+    return this.http.post<any>(`${this.apiBase}/run-reminders`, {}, { params });
   }
 }

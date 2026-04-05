@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface UserBook {
   id: number;
@@ -39,8 +40,7 @@ export interface UserBookProgress {
 
 @Injectable({ providedIn: 'root' })
 export class UserBooksService {
-  private apiBase = 'https://bookguide-api.onrender.com';
-
+private apiBase = `${environment.apiBaseUrl}/UserBooks`;
   constructor(private http: HttpClient) {}
 
   getUserBooks(userId: number): Observable<UserBook[]> {

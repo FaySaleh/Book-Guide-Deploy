@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
+import { environment } from '../../environments/environment';
+
 
 export interface ExternalBook {
   externalBookId: string;
@@ -11,8 +13,7 @@ export interface ExternalBook {
 
 @Injectable({ providedIn: 'root' })
 export class BooksService {
-  private apiBase = 'https://bookguide-api.onrender.com';
-
+private apiBase = environment.apiBaseUrl;
   constructor(private http: HttpClient) {}
 
 search(title: string): Observable<ExternalBook[]> {
