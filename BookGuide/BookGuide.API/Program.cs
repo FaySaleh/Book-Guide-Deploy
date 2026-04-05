@@ -17,8 +17,6 @@ builder.Services.AddScoped<AchievementsService>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 //builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 //builder.Services.AddHostedService<ReminderHostedService>();
-//builder.Services.AddHttpClient<ResendEmailSender>();
-//builder.Services.AddScoped<IEmailSender, ResendEmailSender>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
