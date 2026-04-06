@@ -5,8 +5,11 @@ using BookGuide.API.Models;
 using BookGuide.API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
+using System.Net.Sockets;
+
 
 namespace BookGuide.API.Controllers
 {
@@ -17,12 +20,15 @@ namespace BookGuide.API.Controllers
         private readonly BookGuideDbContext _db;
         private readonly IEmailSender _email;
         private readonly IConfiguration _config;
+        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(BookGuideDbContext db, IEmailSender email, IConfiguration config)
+        public AuthController(BookGuideDbContext db, IEmailSender email, IConfiguration config, ILogger<AuthController> logger)
         {
             _db = db;
             _email = email;
             _config = config;
+            _logger = logger;
+
         }
 
 
@@ -119,6 +125,8 @@ namespace BookGuide.API.Controllers
 
 
 
+
+
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest dto)
         {
@@ -163,27 +171,13 @@ namespace BookGuide.API.Controllers
                 resetUrl
             );
 
-            try
+            return Ok(new
             {
-                await _email.SendAsync(
-                    user.Email,
-                    "Reset your BookGuide password",
-                    html
-                );
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("EMAIL ERROR:");
-                Console.WriteLine(ex.ToString());
+                message = "Reset link generated successfully.",
+                resetUrl
+            });
 
-                return StatusCode(500, new
-                {
-                    message = "Failed to send reset email.",
-                    error = ex.Message
-                });
-            }
-
-            return Ok(new { message = "If the email exists, a reset link will be sent." });
+            // return Ok(new { message = "If the email exists, a reset link will be sent." });
         }
 
         [HttpPost("forgot-password-dev")]
@@ -231,6 +225,32 @@ namespace BookGuide.API.Controllers
             });
         }
 
+        [HttpGet("test-smtp")]
+        public async Task<IActionResult> TestSmtp()
+        {
+            try
+            {
+                using var client = new TcpClient();
+
+                var connectTask = client.ConnectAsync("smtp.gmail.com", 587);
+
+                var timeoutTask = Task.Delay(10000); // 10 ثواني
+
+                var completed = await Task.WhenAny(connectTask, timeoutTask);
+
+                if (completed == timeoutTask)
+                {
+                    return StatusCode(500, "❌ Timeout: Cannot connect to SMTP server");
+                }
+
+                return Ok("✅ Connected to SMTP successfully");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"❌ SMTP connection failed: {ex.Message}");
+            }
+        }
+
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest req)
         {
@@ -270,4 +290,6 @@ namespace BookGuide.API.Controllers
             return Convert.ToHexString(bytes);
         }
     }
+
+
 }
