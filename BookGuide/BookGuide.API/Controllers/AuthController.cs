@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
-using System.Net.Sockets;
 
 
 namespace BookGuide.API.Controllers
