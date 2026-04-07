@@ -165,21 +165,6 @@ namespace BookGuide.API.Controllers
             return Ok(result);
         }
 
-        [HttpPost("test-email")]
-        public async Task<IActionResult> TestEmail([FromQuery] int userId = 2)
-        {
-            await _notificationsService.CreateAsync(
-                userId: userId,
-                title: "Test Email",
-                message: "إذا وصل هذا الإيميل فـ SMTP مضبوط ✅",
-                userBookId: null
-            );
-
-            return Ok("Triggered CreateAsync (DB + Email)");
-        }
-
-
-
     }
 
 }
