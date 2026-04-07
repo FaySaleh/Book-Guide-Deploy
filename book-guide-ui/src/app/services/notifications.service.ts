@@ -23,7 +23,7 @@ export interface PagedNotifications {
 
 @Injectable({ providedIn: 'root' })
 export class NotificationsService {
-private apiBase = `${environment.apiBaseUrl}/UserBooks`;
+private apiBase = `${environment.apiBaseUrl}/api/Notifications`;
   private unreadSubject = new BehaviorSubject<number>(0);
   unreadCount$ = this.unreadSubject.asObservable();
 
