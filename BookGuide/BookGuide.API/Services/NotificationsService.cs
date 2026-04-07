@@ -83,8 +83,8 @@ namespace BookGuide.API.Services
             if (days > 30) days = 30;
 
             var threshold = DateTime.UtcNow.AddDays(-days);
-            var cooldown = TimeSpan.FromMinutes(1440);
-       // var cooldown = TimeSpan.FromDays(1);
+        var cooldown = TimeSpan.FromMinutes(1);
+    //  var cooldown = TimeSpan.FromDays(1);
             var since = DateTime.UtcNow - cooldown;
 
             var candidates = await _db.UserBooks
