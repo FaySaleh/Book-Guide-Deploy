@@ -125,7 +125,6 @@ namespace BookGuide.API.Controllers
 
 
 
-
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest dto)
         {
@@ -176,79 +175,9 @@ namespace BookGuide.API.Controllers
                 resetUrl
             });
 
-            // return Ok(new { message = "If the email exists, a reset link will be sent." });
         }
 
-        [HttpPost("forgot-password-dev")]
-        public async Task<IActionResult> ForgotPasswordDev(ForgotPasswordRequest dto)
-        {
-            var email = dto.Email?.Trim().ToLower();
-            if (string.IsNullOrWhiteSpace(email))
-                return BadRequest(new { message = "Email is required." });
-
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email);
-            if (user == null)
-                return NotFound(new { message = "User not found." });
-
-            var token = Guid.NewGuid().ToString("N");
-            var tokenHash = Sha256(token);
-
-            var resetToken = new PasswordResetToken
-            {
-                UserId = user.Id,
-                TokenHash = tokenHash,
-                CreatedAt = DateTime.UtcNow,
-                ExpiryAt = DateTime.UtcNow.AddHours(1),
-                IsUsed = false
-            };
-
-            _db.PasswordResetTokens.Add(resetToken);
-            await _db.SaveChangesAsync();
-
-            var frontendBaseUrl = _config["App:FrontendBaseUrl"]?.Trim().TrimEnd('/');
-            if (string.IsNullOrWhiteSpace(frontendBaseUrl))
-            {
-                return StatusCode(500, new
-                {
-                    message = "FrontendBaseUrl is not configured."
-                });
-            }
-
-            var resetUrl = $"{frontendBaseUrl}/reset-password?token={token}";
-
-            return Ok(new
-            {
-                message = "Reset token created successfully.",
-                token,
-                resetUrl
-            });
-        }
-
-        [HttpGet("test-smtp")]
-        public async Task<IActionResult> TestSmtp()
-        {
-            try
-            {
-                using var client = new TcpClient();
-
-                var connectTask = client.ConnectAsync("smtp.gmail.com", 587);
-
-                var timeoutTask = Task.Delay(10000); // 10 ثواني
-
-                var completed = await Task.WhenAny(connectTask, timeoutTask);
-
-                if (completed == timeoutTask)
-                {
-                    return StatusCode(500, "❌ Timeout: Cannot connect to SMTP server");
-                }
-
-                return Ok("✅ Connected to SMTP successfully");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"❌ SMTP connection failed: {ex.Message}");
-            }
-        }
+       
 
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest req)
