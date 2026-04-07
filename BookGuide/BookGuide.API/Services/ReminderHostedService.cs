@@ -49,7 +49,7 @@ namespace BookGuide.API.Services
 
                 try
                 {
-                    await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+                    await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
 
                 }
                 catch (OperationCanceledException)
