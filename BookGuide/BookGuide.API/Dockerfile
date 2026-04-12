@@ -1,11 +1,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY ["BookGuide/BookGuide.API/BookGuide.API.csproj", "BookGuide/BookGuide.API/"]
-RUN dotnet restore "BookGuide/BookGuide.API/BookGuide.API.csproj"
+COPY ["BookGuide.API/BookGuide.API.csproj", "BookGuide.API/"]
+RUN dotnet restore "BookGuide.API/BookGuide.API.csproj"
 
 COPY . .
-WORKDIR /src/BookGuide/BookGuide.API
+WORKDIR /src/BookGuide.API
 RUN dotnet publish "BookGuide.API.csproj" -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
