@@ -29,7 +29,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy
-            .WithOrigins("https://illustrious-liberation-production.up.railway.app")
+            .WithOrigins(
+             "https://bookguide-ui.onrender.com",
+            "https://illustrious-liberation-production.up.railway.app")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
