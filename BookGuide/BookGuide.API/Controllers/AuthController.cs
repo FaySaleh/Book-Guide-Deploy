@@ -28,6 +28,7 @@ namespace BookGuide.API.Controllers
             _config = config;
             _logger = logger;
 
+
         }
 
 
@@ -168,6 +169,7 @@ namespace BookGuide.API.Controllers
                 user.FullName,
                 resetUrl
             );
+            await _email.SendAsync(user.Email, "Reset your password", html);
 
             return Ok(new
             {
