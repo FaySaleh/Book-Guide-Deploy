@@ -22,11 +22,22 @@ namespace BookGuide.API.Services
             var smtpUser = _config["Email:Username"];
             var smtpPass = _config["Email:Password"];
 
+            _logger.LogInformation("Email send started. To={ToEmail}, Host={Host}, Port={Port}, From={From}",
+                toEmail, smtpHost, smtpPortValue, fromEmail);
+
+            if (string.IsNullOrWhiteSpace(fromEmail) ||
+                string.IsNullOrWhiteSpace(smtpHost) ||
+                string.IsNullOrWhiteSpace(smtpUser) ||
+                string.IsNullOrWhiteSpace(smtpPass))
+            {
+                throw new Exception("Email configuration is missing.");
+            }
+
             if (!int.TryParse(smtpPortValue, out var smtpPort))
                 smtpPort = 587;
 
             using var message = new MailMessage();
-            message.From = new MailAddress(fromEmail!, "Book Guide");
+            message.From = new MailAddress(fromEmail, "Book Guide");
             message.To.Add(toEmail);
             message.Subject = subject;
             message.Body = body;
@@ -41,7 +52,16 @@ namespace BookGuide.API.Services
                 Timeout = 30000
             };
 
-            await smtp.SendMailAsync(message);
+            try
+            {
+                await smtp.SendMailAsync(message);
+                _logger.LogInformation("Email sent successfully to {ToEmail}", toEmail);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Email sending failed to {ToEmail}", toEmail);
+                throw;
+            }
         }
     }
 }
