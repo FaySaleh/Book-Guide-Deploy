@@ -24,6 +24,7 @@ namespace BookGuide.API.Services
 
             _logger.LogInformation("Email send started. To={ToEmail}, Host={Host}, Port={Port}, From={From}",
                 toEmail, smtpHost, smtpPortValue, fromEmail);
+            _logger.LogInformation("SMTP username configured: {User}", smtpUser);
 
             if (string.IsNullOrWhiteSpace(fromEmail) ||
                 string.IsNullOrWhiteSpace(smtpHost) ||
@@ -49,7 +50,7 @@ namespace BookGuide.API.Services
                 UseDefaultCredentials = false,
                 Credentials = new NetworkCredential(smtpUser, smtpPass),
                 DeliveryMethod = SmtpDeliveryMethod.Network,
-                Timeout = 30000
+                Timeout = 10000
             };
 
             try
