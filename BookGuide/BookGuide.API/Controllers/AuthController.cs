@@ -28,7 +28,6 @@ namespace BookGuide.API.Controllers
             _config = config;
             _logger = logger;
 
-
         }
 
 
@@ -169,26 +168,12 @@ namespace BookGuide.API.Controllers
                 user.FullName,
                 resetUrl
             );
-            try
-            {
-                await _email.SendAsync(user.Email, "Reset your password", html);
 
-                return Ok(new
-                {
-                    message = "Reset link sent successfully.",
-                    resetUrl
-                });
-            }
-            catch (Exception ex)
+            return Ok(new
             {
-                _logger.LogError(ex, "Forgot password email failed for {Email}", user.Email);
-
-                return StatusCode(500, new
-                {
-                    message = "Email sending failed.",
-                    error = ex.Message
-                });
-            }
+                message = "Reset link generated successfully.",
+                resetUrl
+            });
 
         }
 
