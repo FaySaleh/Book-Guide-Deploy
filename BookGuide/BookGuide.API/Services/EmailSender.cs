@@ -1,5 +1,6 @@
-﻿using System.Net;
-using System.Net.Mail;
+﻿using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 
 namespace BookGuide.API.Services
 {
@@ -7,62 +8,68 @@ namespace BookGuide.API.Services
     {
         private readonly IConfiguration _config;
         private readonly ILogger<EmailSender> _logger;
+        private readonly HttpClient _httpClient;
 
-        public EmailSender(IConfiguration config, ILogger<EmailSender> logger)
+        public EmailSender(
+            IConfiguration config,
+            ILogger<EmailSender> logger,
+            IHttpClientFactory httpClientFactory)
         {
             _config = config;
             _logger = logger;
+            _httpClient = httpClientFactory.CreateClient();
         }
 
-        public async Task SendAsync(string toEmail, string subject, string body)
+        public async Task SendAsync(string toEmail, string subject, string html)
         {
-            var fromEmail = _config["Email:From"];
-            var smtpHost = _config["Email:Host"];
-            var smtpPortValue = _config["Email:Port"];
-            var smtpUser = _config["Email:Username"];
-            var smtpPass = _config["Email:Password"];
+            var apiKey = _config["Resend:ApiKey"];
+            var fromEmail = _config["Resend:FromEmail"];
 
-            _logger.LogInformation("Email send started. To={ToEmail}, Host={Host}, Port={Port}, From={From}",
-                toEmail, smtpHost, smtpPortValue, fromEmail);
-            _logger.LogInformation("SMTP username configured: {User}", smtpUser);
+            if (string.IsNullOrWhiteSpace(apiKey))
+                throw new Exception("Resend API key is missing.");
 
-            if (string.IsNullOrWhiteSpace(fromEmail) ||
-                string.IsNullOrWhiteSpace(smtpHost) ||
-                string.IsNullOrWhiteSpace(smtpUser) ||
-                string.IsNullOrWhiteSpace(smtpPass))
+            if (string.IsNullOrWhiteSpace(fromEmail))
+                throw new Exception("Resend FromEmail is missing.");
+
+            _logger.LogInformation(
+                "Resend send started. To={ToEmail}, From={FromEmail}",
+                toEmail, fromEmail);
+
+            using var request = new HttpRequestMessage(
+                HttpMethod.Post,
+                "https://api.resend.com/emails");
+
+            request.Headers.Authorization =
+                new AuthenticationHeaderValue("Bearer", apiKey);
+
+            var payload = new
             {
-                throw new Exception("Email configuration is missing.");
-            }
-
-            if (!int.TryParse(smtpPortValue, out var smtpPort))
-                smtpPort = 587;
-
-            using var message = new MailMessage();
-            message.From = new MailAddress(fromEmail, "Book Guide");
-            message.To.Add(toEmail);
-            message.Subject = subject;
-            message.Body = body;
-            message.IsBodyHtml = true;
-
-            using var smtp = new SmtpClient(smtpHost, smtpPort)
-            {
-                EnableSsl = true,
-                UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(smtpUser, smtpPass),
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                Timeout = 10000
+                from = fromEmail,
+                to = new[] { toEmail },
+                subject = subject,
+                html = html
             };
 
-            try
+            request.Content = new StringContent(
+                JsonSerializer.Serialize(payload),
+                Encoding.UTF8,
+                "application/json");
+
+            using var response = await _httpClient.SendAsync(request);
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
             {
-                await smtp.SendMailAsync(message);
-                _logger.LogInformation("Email sent successfully to {ToEmail}", toEmail);
+                _logger.LogError(
+                    "Resend send failed. Status={StatusCode}, Body={Body}",
+                    response.StatusCode, responseBody);
+
+                throw new Exception("Resend email failed: " + responseBody);
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Email sending failed to {ToEmail}", toEmail);
-                throw;
-            }
+
+            _logger.LogInformation(
+                "Resend email sent successfully to {ToEmail}",
+                toEmail);
         }
     }
 }
