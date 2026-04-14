@@ -47,8 +47,8 @@ namespace BookGuide.API.Services
                     _logger.LogError(ex, "Error while running ReminderHostedService.");
                 }
 
-                try
-                {
+                try { 
+               
                     await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
 
                 }
