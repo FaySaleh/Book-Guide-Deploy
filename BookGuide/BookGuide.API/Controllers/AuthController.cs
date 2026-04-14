@@ -89,7 +89,7 @@ namespace BookGuide.API.Controllers
             try
             {
                 await _email.SendAsync(
-                    "fai.saleh1421@gmail.com", // حطي إيميلك
+                    "faysaltuwaijri@gmail.com",  
                     "Test Email",
                     "<h3>This is a test email from BookGuide 🚀</h3>"
                 );
