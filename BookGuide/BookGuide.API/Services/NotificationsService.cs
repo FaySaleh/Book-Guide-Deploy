@@ -115,7 +115,7 @@ namespace BookGuide.API.Services
                 <td style=""padding:18px 22px 10px;"">
                   <table>
                     <tr>
-                      <td style=""border-radius:12px; background:#4CAF50;"">
+                      <td style=""border-radius:12px; background:#B0E0E6;"">
                         <a href=""{{APP_URL}}"" style=""display:inline-block; padding:14px 18px; font-size:14px; font-weight:800; color:#ffffff; text-decoration:none; border-radius:12px;"">
                           Continue Reading
                         </a>
@@ -123,9 +123,6 @@ namespace BookGuide.API.Services
                     </tr>
                   </table>
 
-                  <p style=""margin:14px 0 0; font-size:12.5px; color:#64748b;"">
-                    Keep your reading streak going 
-                  </p>
                 </td>
               </tr>
 
