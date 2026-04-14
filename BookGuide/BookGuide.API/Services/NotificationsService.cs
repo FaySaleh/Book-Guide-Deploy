@@ -175,8 +175,8 @@ namespace BookGuide.API.Services
             if (days < 1) days = 1;
             if (days > 30) days = 30;
 
-            var threshold = DateTime.UtcNow.AddDays(-days);
-           // var threshold = DateTime.UtcNow.AddMinutes(-2);
+            //var threshold = DateTime.UtcNow.AddDays(-days);
+            var threshold = DateTime.UtcNow.AddMinutes(-2);
 
             var cooldown = TimeSpan.FromMinutes(2);
     //  var cooldown = TimeSpan.FromDays(1);
