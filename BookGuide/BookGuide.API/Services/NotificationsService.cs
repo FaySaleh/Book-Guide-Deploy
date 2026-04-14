@@ -52,7 +52,100 @@ namespace BookGuide.API.Services
             {
                 try
                 {
-                    await _email.SendAsync(user.Email, title, message);
+                    var html = @"<!doctype html>
+<html lang=""en"">
+<head>
+  <meta charset=""utf-8"" />
+  <meta name=""viewport"" content=""width=device-width, initial-scale=1"" />
+  <meta name=""x-apple-disable-message-reformatting"" />
+  <title>Reading Reminder</title>
+</head>
+<body style=""margin:0; padding:0; background:#f5f7fb; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; color:#0f172a;"">
+  <div style=""display:none; max-height:0; overflow:hidden; opacity:0; color:transparent;"">
+    Time to get back to your reading 📚
+  </div>
+
+  <table role=""presentation"" width=""100%"" cellspacing=""0"" cellpadding=""0"" border=""0"" style=""background:#f5f7fb; padding:24px 12px;"">
+    <tr><td align=""center"">
+      <table role=""presentation"" width=""600"" cellspacing=""0"" cellpadding=""0"" border=""0"" style=""width:600px; max-width:100%;"">
+
+        <!-- Header -->
+        <tr>
+          <td style=""padding:10px 8px 18px;"">
+            <table role=""presentation"" width=""100%"" cellspacing=""0"" cellpadding=""0"" border=""0"">
+              <tr>
+                <td align=""left"" style=""vertical-align:middle;"">
+                  <img src=""https://i.ibb.co/TMzSkvpW/Logo.png"" width=""44"" height=""44"" style=""border-radius:10px;"" />
+                </td>
+                <td align=""left"" style=""padding-left:12px; vertical-align:middle;"">
+                  <div style=""font-size:16px; font-weight:800;"">BookGuide</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Card -->
+        <tr>
+          <td style=""background:#ffffff; border:1px solid #e6eaf2; border-radius:16px; overflow:hidden; box-shadow:0 10px 24px rgba(15,23,42,0.08);"">
+            <table width=""100%"" cellpadding=""0"" cellspacing=""0"">
+
+              <!-- Title -->
+              <tr>
+                <td style=""padding:26px 22px 10px;"">
+                  <h1 style=""margin:0; font-size:22px;"">📚 Reading Reminder</h1>
+                  <p style=""margin:12px 0 0; font-size:14px; color:#334155;"">
+                    Hi {{USER_NAME}},<br/>
+                    It's been a while since you last read:
+                  </p>
+                </td>
+              </tr>
+
+              <!-- Book -->
+              <tr>
+                <td style=""padding:10px 22px;"">
+                  <div style=""font-size:18px; font-weight:700; color:#0f172a;"">
+                    {{BOOK_TITLE}}
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Button -->
+              <tr>
+                <td style=""padding:18px 22px 10px;"">
+                  <table>
+                    <tr>
+                      <td style=""border-radius:12px; background:#4CAF50;"">
+                        <a href=""{{APP_URL}}"" style=""display:inline-block; padding:14px 18px; font-size:14px; font-weight:800; color:#ffffff; text-decoration:none; border-radius:12px;"">
+                          Continue Reading
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+
+                  <p style=""margin:14px 0 0; font-size:12.5px; color:#64748b;"">
+                    Keep your reading streak going 🔥
+                  </p>
+                </td>
+              </tr>
+
+              <tr><td style=""padding:10px 22px;""><div style=""height:1px; background:#eef2f7;""></div></td></tr>
+
+            </table>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>";
+                    var htmlBody = html
+                        .Replace("{{USER_NAME}}", user.FullName)
+                        .Replace("{{BOOK_TITLE}}", message)
+                        .Replace("{{APP_URL}}", "https://bookguide-ui.onrender.com");
+
+                    await _email.SendAsync(user.Email, "Reading Reminder", htmlBody);
                     _logger.LogInformation(
                         "Reminder email sent successfully to {email} for UserId={userId}",
                         user.Email,
