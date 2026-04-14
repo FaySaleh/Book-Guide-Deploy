@@ -62,7 +62,7 @@ namespace BookGuide.API.Services
 </head>
 <body style=""margin:0; padding:0; background:#f5f7fb; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; color:#0f172a;"">
   <div style=""display:none; max-height:0; overflow:hidden; opacity:0; color:transparent;"">
-    Time to get back to your reading 📚
+    Time to get back to your reading 
   </div>
 
   <table role=""presentation"" width=""100%"" cellspacing=""0"" cellpadding=""0"" border=""0"" style=""background:#f5f7fb; padding:24px 12px;"">
