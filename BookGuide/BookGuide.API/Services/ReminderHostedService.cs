@@ -30,7 +30,7 @@ namespace BookGuide.API.Services
 
                     _logger.LogInformation("Running reading reminders at: {time}", DateTime.UtcNow);
 
-                    var result = await notificationsService.RunReadingRemindersAsync(2, stoppingToken);
+                    var result = await notificationsService.RunReadingRemindersAsync(1, stoppingToken);
 
                     _logger.LogInformation(
                         "Reading reminders completed. Matched={matched}, Created={created}",
