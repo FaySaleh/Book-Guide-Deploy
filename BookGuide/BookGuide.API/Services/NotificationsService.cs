@@ -93,7 +93,7 @@ namespace BookGuide.API.Services
               <!-- Title -->
               <tr>
                 <td style=""padding:26px 22px 10px;"">
-                  <h1 style=""margin:0; font-size:22px;"">📚 Reading Reminder</h1>
+                  <h1 style=""margin:0; font-size:22px;""> Reading Reminder</h1>
                   <p style=""margin:12px 0 0; font-size:14px; color:#334155;"">
                     Hi {{USER_NAME}},<br/>
                     It's been a while since you last read:
@@ -124,7 +124,7 @@ namespace BookGuide.API.Services
                   </table>
 
                   <p style=""margin:14px 0 0; font-size:12.5px; color:#64748b;"">
-                    Keep your reading streak going 🔥
+                    Keep your reading streak going 
                   </p>
                 </td>
               </tr>
@@ -175,7 +175,9 @@ namespace BookGuide.API.Services
             if (days < 1) days = 1;
             if (days > 30) days = 30;
 
-            var threshold = DateTime.UtcNow.AddMinutes(-2);
+            var threshold = DateTime.UtcNow.AddDays(-days);
+           // var threshold = DateTime.UtcNow.AddMinutes(-2);
+
             var cooldown = TimeSpan.FromMinutes(2);
     //  var cooldown = TimeSpan.FromDays(1);
             var since = DateTime.UtcNow - cooldown;
