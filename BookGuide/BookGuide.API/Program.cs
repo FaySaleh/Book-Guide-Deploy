@@ -31,8 +31,8 @@ builder.Services.AddCors(options =>
         policy
             .WithOrigins(
              "http://localhost:4200",
-             "https://book-guide-ui.up.railway.app",
-             "https://illustrious-liberation-production.up.railway.app")
+             "https://bookguide-ui.onrender.com",
+             "https://book-guide-ui.up.railway.app" )
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
