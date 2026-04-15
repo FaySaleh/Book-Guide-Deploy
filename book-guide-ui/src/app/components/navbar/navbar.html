@@ -14,8 +14,26 @@
   <div class="right">
 
     <!-- Language -->
-<button class="icon-btn lang-btn" (click)="toggleLang()" title="Language">
-  {{ lang.current() === 'ar' ? 'EN' : 'AR' }}
+<!-- Language -->
+<button
+  class="lang-toggle"
+  (click)="toggleLang()"
+  [attr.title]="lang.current() === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'"
+  [attr.aria-label]="lang.current() === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'"
+>
+  <span class="lang-track" [class.is-ar]="lang.current() === 'ar'" [class.is-en]="lang.current() === 'en'">
+    <span class="lang-thumb">
+      <svg viewBox="0 0 24 24" class="lang-globe" aria-hidden="true">
+        <path
+          d="M12 2a10 10 0 100 20 10 10 0 000-20zm6.93 9h-3.14a15.7 15.7 0 00-1.15-5A8.03 8.03 0 0118.93 11zM12 4c.8 0 2.17 1.89 2.75 5h-5.5C9.83 5.89 11.2 4 12 4zM4.07 13h3.14a15.7 15.7 0 001.15 5A8.03 8.03 0 014.07 13zm0-2A8.03 8.03 0 018.36 6a15.7 15.7 0 00-1.15 5H4.07zm7.93 9c-.8 0-2.17-1.89-2.75-5h5.5c-.58 3.11-1.95 5-2.75 5zm3.64-2a15.7 15.7 0 001.15-5h3.14a8.03 8.03 0 01-4.29 5zM9 11c.06-1.43.32-2.79.72-4h4.56c.4 1.21.66 2.57.72 4H9zm6 2a13.7 13.7 0 01-.72 4H9.72A13.7 13.7 0 019 13h6z"
+          fill="currentColor"
+        />
+      </svg>
+    </span>
+
+    <span class="lang-label lang-ar">AR</span>
+    <span class="lang-label lang-en">EN</span>
+  </span>
 </button>
 
     <!-- Library -->
