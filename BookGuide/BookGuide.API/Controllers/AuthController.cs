@@ -83,28 +83,6 @@ namespace BookGuide.API.Controllers
             }
         }
 
-        [HttpGet("test-email")]
-        public async Task<IActionResult> TestEmail()
-        {
-            try
-            {
-                await _email.SendAsync(
-                    "faysaltuwaijri@gmail.com",  
-                    "Test Email",
-                    "<h3>This is a test email from BookGuide</h3>"
-                );
-
-                return Ok("Email sent successfully");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new
-                {
-                    message = "Email failed",
-                    error = ex.Message
-                });
-            }
-        }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginRequest request)
