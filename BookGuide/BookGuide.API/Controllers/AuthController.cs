@@ -154,6 +154,9 @@ namespace BookGuide.API.Controllers
             await _db.SaveChangesAsync();
 
             var frontendBaseUrl = _config["App:FrontendBaseUrl"]?.Trim().TrimEnd('/');
+
+
+
             if (string.IsNullOrWhiteSpace(frontendBaseUrl))
             {
                 return StatusCode(500, new
